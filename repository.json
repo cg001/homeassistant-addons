@@ -4,5 +4,6 @@
   "maintainer": "Christian Graf <cg@ceeqoo.com>",
   "addons": [
     "tank-data-reader"
+    "035567c3_tank_data_reader"
   ]
 }

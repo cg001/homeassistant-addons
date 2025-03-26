@@ -1,0 +1,10 @@
+{
+    "name": "Dummy Reset Add-on",
+    "version": "0.0.1",
+    "slug": "tank_data_reader",
+    "description": "Dummy zur Cache-Reset",
+    "startup": "services",
+    "boot": "auto",
+    "ingress": false,
+    "arch": ["amd64"]
+  }
