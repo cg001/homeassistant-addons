@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     py3-pip \
     py3-wheel \
     py3-setuptools \
-    git
+    git \
+    curl
 
 # Install Python dependencies
 RUN pip3 install --no-cache-dir \
@@ -32,6 +33,13 @@ WORKDIR /app
 # Copy run script
 COPY run.sh /
 RUN chmod a+x /run.sh
+
+# Make healthcheck script executable
+RUN chmod a+x /usr/bin/healthcheck
+
+# Set up healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD /usr/bin/healthcheck
 
 # Set entrypoint
 ENTRYPOINT ["/run.sh"]
