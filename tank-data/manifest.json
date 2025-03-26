@@ -1,0 +1,11 @@
+{
+  "name": "Tank Data Add-on",
+  "version": "0.1.0",
+  "slug": "tank_data",
+  "description": "Add-on für Tankdaten",
+  "startup": "services",
+  "boot": "auto",
+  "ingress": false,
+  "arch": ["amd64", "armv7", "aarch64"],
+  "image": "ghcr.io/cg001/tank-data-{arch}"
+}
