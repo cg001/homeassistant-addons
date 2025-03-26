@@ -10,8 +10,14 @@ RUN apk add --no-cache \
     py3-pip \
     py3-wheel \
     py3-setuptools \
-    git
-
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    make \
+    git \
+    curl
+    
 # Install Python dependencies
 RUN pip3 install --no-cache-dir \
     paramiko \
