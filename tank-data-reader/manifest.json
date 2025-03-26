@@ -1,0 +1,10 @@
+{
+  "name": "Tank Data Add-on",
+  "version": "0.1.0",
+  "slug": "tank_data_reader",
+  "description": "Add-on für Tankdaten",
+  "startup": "services",
+  "boot": "auto",
+  "ingress": false,
+  "arch": ["amd64", "armv7", "aarch64"],
+}
