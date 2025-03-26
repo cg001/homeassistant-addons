@@ -3,7 +3,6 @@
   "url": "https://github.com/cg001/homeassistant-addons",
   "maintainer": "Christian Graf <cg@ceeqoo.com>",
   "addons": [
-    "035567c3_tank_data_reader",
     "tank-data-reader"
   ]
 }
