@@ -7,5 +7,4 @@
   "boot": "auto",
   "ingress": false,
   "arch": ["amd64", "armv7", "aarch64"],
-  "image": "ghcr.io/cg001/tank-data-{arch}"
 }
