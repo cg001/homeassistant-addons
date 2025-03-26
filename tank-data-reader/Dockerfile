@@ -1,5 +1,5 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest
-FROM ${BUILD_FROM}
+ARG BUILD_FROM
+FROM $BUILD_FROM
 
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -10,8 +10,7 @@ RUN apk add --no-cache \
     py3-pip \
     py3-wheel \
     py3-setuptools \
-    git \
-    curl
+    git
 
 # Install Python dependencies
 RUN pip3 install --no-cache-dir \
@@ -33,13 +32,6 @@ WORKDIR /app
 # Copy run script
 COPY run.sh /
 RUN chmod a+x /run.sh
-
-# Make healthcheck script executable
-RUN chmod a+x /usr/bin/healthcheck
-
-# Set up healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD /usr/bin/healthcheck
 
 # Set entrypoint
 ENTRYPOINT ["/run.sh"]
