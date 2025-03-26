@@ -1,6 +1,6 @@
 # Tank Data Reader Add-on Configuration
 name: Tank Data Reader
-version: 1.0.0
+version: 1.0.1
 slug: tank_data_reader
 description: Reads tank transaction data from SFTP server and publishes to MQTT
 url: https://github.com/cg001/homeassistant-addons
