@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tank Data</title>
+  <meta charset="utf-8">
+</head>
+<body>
+  <h2>Transaktionen</h2>
+  <button onclick="loadData()">🔁 Refresh</button>
+  <table border="1" id="table"><tr><th>ID</th><th>Inhalt</th></tr></table>
+  <script>
+    function loadData() {
+      fetch("/api/transactions")
+        .then(res => res.json())
+        .then(data => {
+          const tbl = document.getElementById("table");
+          tbl.innerHTML = "<tr><th>ID</th><th>Inhalt</th></tr>";
+          data.forEach((t, i) => {
+            tbl.innerHTML += `<tr><td>${i}</td><td><pre>${JSON.stringify(t, null, 2)}</pre></td></tr>`;
+          });
+        });
+    }
+    loadData();
+  </script>
+</body>
+</html>

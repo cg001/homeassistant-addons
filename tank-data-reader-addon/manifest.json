@@ -1,0 +1,12 @@
+{
+  "name": "Tank Data Reader",
+  "version": "1.0.0",
+  "slug": "tank_data_reader",
+  "description": "Reads tank transaction data from an SFTP server and publishes to MQTT",
+  "startup": "services",
+  "boot": "auto",
+  "ingress": true,
+  "ingress_port": 5000,
+  "panel_icon": "mdi:fuel",
+  "arch": ["amd64"]
+}
