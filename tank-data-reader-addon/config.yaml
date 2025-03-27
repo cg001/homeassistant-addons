@@ -1,0 +1,37 @@
+name: "Tank Data Reader"
+version: "1.0.0"
+slug: "tank_data_reader"
+description: "Reads transaction data via SFTP and publishes to MQTT"
+startup: services
+boot: auto
+ingress: true
+ingress_port: 5000
+panel_icon: mdi:fuel
+arch:
+  - amd64
+options:
+  sftp_host: ""
+  sftp_port: 22
+  sftp_username: ""
+  sftp_password: ""
+  sftp_path: "/remote/path/"
+  mqtt_host: "core-mosquitto"
+  mqtt_port: 1883
+  mqtt_username: ""
+  mqtt_password: ""
+  mqtt_topic_prefix: "tank_data"
+  update_interval: 300
+  log_level: "info"
+schema:
+  sftp_host: str
+  sftp_port: int
+  sftp_username: str
+  sftp_password: str
+  sftp_path: str
+  mqtt_host: str
+  mqtt_port: int
+  mqtt_username: str
+  mqtt_password: str
+  mqtt_topic_prefix: str
+  update_interval: int
+  log_level: list(trace|debug|info|warning|error|fatal)
