@@ -1,7 +1,7 @@
 {
   "name": "Tank Data Reader",
   "version": "1.0.0",
-  "slug": "tank_data_reader",
+  "slug": "tank_data_reader_addon",
   "description": "Reads tank transaction data from an SFTP server and publishes to MQTT",
   "startup": "services",
   "boot": "auto",
