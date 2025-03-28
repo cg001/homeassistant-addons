@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source /venv/bin/activate
-
 HOST=$(bashio::config 'sftp_host')
 PORT=$(bashio::config 'sftp_port')
 USER=$(bashio::config 'sftp_username')
@@ -24,5 +22,5 @@ EOF
 for file in /tmp/tank_data/*.json; do
   [ -e "$file" ] || continue
   id=$(basename "$file" .json)
-  cat "$file" | /venv/bin/python3 -m paho.mqtt.publish --hostname "$MQTT_HOST" --port "$MQTT_PORT" --topic "$TOPIC_PREFIX/transaction/$id" --username "$MQTT_USER" --password "$MQTT_PASS"
+  cat "$file" | python3 -m paho.mqtt.publish --hostname "$MQTT_HOST" --port "$MQTT_PORT" --topic "$TOPIC_PREFIX/transaction/$id" --username "$MQTT_USER" --password "$MQTT_PASS"
 done

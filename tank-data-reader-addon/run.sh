@@ -1,8 +1,5 @@
 #!/usr/bin/with-contenv bashio
 
-# Aktiviere Python venv
-source /venv/bin/activate
-
 # Starte Webserver im Hintergrund
 python3 /webserver.py &
 
