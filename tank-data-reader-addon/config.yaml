@@ -1,5 +1,5 @@
 name: "Tank Data Reader"
-version: "1.0.0"
+version: "1.0.1"
 slug: "tank_data_reader_addon"
 description: "Reads transaction data via SFTP and publishes to MQTT"
 startup: services
