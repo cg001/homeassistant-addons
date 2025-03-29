@@ -1,0 +1,1 @@
+print("🧪 TEST: Skript wurde erfolgreich ausgeführt")

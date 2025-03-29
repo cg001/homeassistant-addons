@@ -6,6 +6,7 @@
     "tank-data-reader",
     "nginx-verified-addon",
     "flightdirector-proxy",
-    "tankdata-sftp-list-addon"
+    "tankdata-sftp-list-addon",
+    "tankdata-sftp-list-addon-debug-012"
   ]
 }
