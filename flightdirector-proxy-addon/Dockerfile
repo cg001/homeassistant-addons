@@ -5,4 +5,5 @@ RUN apk add --no-cache nginx apache2-utils
 
 COPY rootfs/ /
 
+# Set correct permissions for s6-overlay
 RUN chmod +x /etc/services.d/nginx/run /etc/services.d/nginx/finish
