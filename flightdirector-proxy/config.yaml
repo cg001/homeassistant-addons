@@ -1,7 +1,7 @@
-name: "Flightdirector Proxy"
-version: "0.1.0"
+name: "Flightdirector"
+version: "0.2.0"
 slug: "flightdirector_proxy"
-description: "Proxy for flightdirector.de with automatic login"
+description: "Proxy for flightdirector.de with automatic login using Flask backend"
 startup: services
 boot: auto
 ingress: true
@@ -10,5 +10,9 @@ init: false
 panel_icon: mdi:airplane
 arch:
   - amd64
-options: {}
-schema: {}
+options:
+  username: "loau"
+  password: "loau!stockerau"
+schema:
+  username: str
+  password: password

@@ -1,2 +1,13 @@
 #!/usr/bin/with-contenv bashio
+
+USERNAME=$(bashio::config 'username')
+PASSWORD=$(bashio::config 'password')
+
+export FD_USERNAME=$USERNAME
+export FD_PASSWORD=$PASSWORD
+
+# Starte Flask im Hintergrund
+python3 /app/app.py &
+
+# Starte nginx im Vordergrund
 exec nginx -g 'daemon off;'

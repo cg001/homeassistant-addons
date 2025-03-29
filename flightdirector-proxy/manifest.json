@@ -1,8 +1,8 @@
 {
-  "name": "Flightdirector Proxy",
-  "version": "0.1.0",
+  "name": "Flightdirector",
+  "version": "0.2.0",
   "slug": "flightdirector_proxy",
-  "description": "Proxy for flightdirector.de with automatic login",
+  "description": "Proxy for flightdirector.de with automatic login using Flask backend",
   "startup": "services",
   "boot": "auto",
   "ingress": true,
