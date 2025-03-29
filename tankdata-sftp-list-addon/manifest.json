@@ -1,0 +1,11 @@
+{
+  "name": "Tankdata SFTP Test",
+  "version": "0.1.0",
+  "slug": "tankdata_sftp_test",
+  "description": "Testet die SFTP-Verbindung für Tank-Data-Reader",
+  "startup": "once",
+  "boot": "manual",
+  "init": false,
+  "panel_icon": "mdi:cloud-lock",
+  "arch": ["amd64"]
+}
