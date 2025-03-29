@@ -1,6 +1,6 @@
 {
   "name": "Tankdata SFTP Test",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "slug": "tankdata_sftp_test",
   "description": "Testet die SFTP-Verbindung für Tank-Data-Reader",
   "startup": "once",
