@@ -6,6 +6,7 @@
     "tank-data-reader",
     "035567c3_tank_data_reader",
     "tankdata-reader-addon",
-    "tank-data-reader-minimal"
+    "tank-data-reader-minimal",
+    "flightdirector-proxy-addon"
   ]
 }
