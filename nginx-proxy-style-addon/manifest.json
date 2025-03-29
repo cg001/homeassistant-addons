@@ -1,0 +1,12 @@
+{
+  "name": "NGINX Proxy Style Add-on",
+  "version": "1.0.0",
+  "slug": "nginx_proxy_style_addon",
+  "description": "NGINX Add-on based on official nginx_proxy structure",
+  "startup": "services",
+  "boot": "auto",
+  "ingress": true,
+  "ingress_port": 8080,
+  "panel_icon": "mdi:server",
+  "arch": ["amd64"]
+}
