@@ -1,4 +1,4 @@
-name: "Tankdata SFTP Test"5
+name: "Tankdata SFTP Test5"
 version: "0.1.5"
 slug: "tankdata_sftp_test5"
 description: "Testet die SFTP-Verbindung und listet XML-Dateien im Zielverzeichnis"
