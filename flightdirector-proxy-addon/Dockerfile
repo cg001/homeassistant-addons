@@ -3,6 +3,6 @@ FROM ${BUILD_FROM}
 
 RUN apk add --no-cache nginx apache2-utils
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY rootfs/ /
 
-CMD ["nginx", "-g", "daemon off;"]
+# Keine CMD, s6-overlay übernimmt Prozessstart
