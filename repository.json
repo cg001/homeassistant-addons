@@ -5,6 +5,7 @@
   "addons": [
     "tank-data-reader",
     "035567c3_tank_data_reader",
-    "tankdata-reader-addon"
+    "tankdata-reader-addon",
+    "tank-data-reader-minimal"
   ]
 }

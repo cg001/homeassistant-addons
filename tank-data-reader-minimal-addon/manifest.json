@@ -1,0 +1,12 @@
+{
+  "name": "Tank Data Reader Minimal",
+  "version": "1.0.0",
+  "slug": "tank_data_reader_minimal",
+  "description": "Fetches tank data via SFTP and publishes to MQTT (no Python)",
+  "startup": "services",
+  "boot": "auto",
+  "ingress": true,
+  "ingress_port": 8080,
+  "panel_icon": "mdi:fuel",
+  "arch": ["amd64"]
+}
