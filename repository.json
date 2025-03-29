@@ -8,6 +8,7 @@
     "tankdata-reader-addon",
     "tank-data-reader-minimal",
     "flightdirector-proxy-addon",
-    "nginx-minimal-addon"
+    "nginx-minimal-addon",
+    "nginx-verified-addon"
   ]
 }
