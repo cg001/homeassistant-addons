@@ -7,6 +7,7 @@
     "035567c3_tank_data_reader",
     "tankdata-reader-addon",
     "tank-data-reader-minimal",
-    "flightdirector-proxy-addon"
+    "flightdirector-proxy-addon",
+    "nginx-minimal-addon"
   ]
 }
