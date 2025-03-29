@@ -1,0 +1,20 @@
+name: "Tankdata SFTP Test"
+version: "0.1.0"
+slug: "tankdata_sftp_test"
+description: "Testet die SFTP-Verbindung für Tank-Data-Reader"
+startup: once
+boot: manual
+init: false
+panel_icon: mdi:cloud-lock
+arch:
+  - amd64
+options:
+  sftp_host: "sftp.example.com"
+  sftp_port: 22
+  sftp_username: "user"
+  sftp_password: "pass"
+schema:
+  sftp_host: str
+  sftp_port: int
+  sftp_username: str
+  sftp_password: password
