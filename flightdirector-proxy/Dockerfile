@@ -4,7 +4,7 @@ FROM ${BUILD_FROM}
 ENV LANG C.UTF-8
 
 RUN apk add --no-cache nginx bash python3 py3-pip curl
-RUN pip3 install flask requests
+RUN pip3 install --break-system-packages flask requests
 
 COPY rootfs/ /
 COPY src/ /app/
