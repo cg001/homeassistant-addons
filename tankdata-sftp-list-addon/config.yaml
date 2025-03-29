@@ -1,6 +1,6 @@
 name: "Tankdata SFTP List"
 version: "0.1.1"
-slug: "tankdata_sftp_test"
+slug: "tankdata_sftp_list"
 description: "Testet die SFTP-Verbindung für Tank-Data-Reader"
 startup: once
 boot: manual
