@@ -1,0 +1,13 @@
+#!/usr/bin/with-contenv bashio
+
+HOST=$(bashio::config 'sftp_host')
+PORT=$(bashio::config 'sftp_port')
+USER=$(bashio::config 'sftp_username')
+PASS=$(bashio::config 'sftp_password')
+
+export SFTP_HOST=$HOST
+export SFTP_PORT=$PORT
+export SFTP_USER=$USER
+export SFTP_PASS=$PASS
+
+exec python3 /app/sftp_test.py
