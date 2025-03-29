@@ -1,5 +1,5 @@
 name: "Flightdirector Proxy"
-version: "1.0.0"
+version: "1.0.1"
 slug: "flightdirector_proxy"
 description: "Proxy for flightdirector.de with automatic login"
 startup: services
