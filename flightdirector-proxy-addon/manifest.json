@@ -1,7 +1,7 @@
 {
   "name": "Flightdirector Proxy",
   "version": "1.0.0",
-  "slug": "flightdirector_proxy",
+  "slug": "flightdirector_proxy_addon",
   "description": "Proxy for flightdirector.de with automatic login",
   "startup": "services",
   "boot": "auto",
