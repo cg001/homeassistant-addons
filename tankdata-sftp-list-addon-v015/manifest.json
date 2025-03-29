@@ -1,0 +1,11 @@
+{
+  "name": "Tankdata SFTP Test5",
+  "version": "0.1.5",
+  "slug": "tankdata_sftp_test5",
+  "description": "Testet die SFTP-Verbindung und listet XML-Dateien im Zielverzeichnis",
+  "startup": "once",
+  "boot": "manual",
+  "init": false,
+  "panel_icon": "mdi:cloud-lock",
+  "arch": ["amd64"]
+}

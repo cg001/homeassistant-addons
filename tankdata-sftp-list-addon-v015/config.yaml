@@ -1,0 +1,22 @@
+name: "Tankdata SFTP Test"5
+version: "0.1.5"
+slug: "tankdata_sftp_test5"
+description: "Testet die SFTP-Verbindung und listet XML-Dateien im Zielverzeichnis"
+startup: once
+boot: manual
+init: false
+panel_icon: mdi:cloud-lock
+arch:
+  - amd64
+options:
+  sftp_host: "sftp.example.com"
+  sftp_port: 22
+  sftp_username: "user"
+  sftp_password: "pass"
+  sftp_directory: "/diskc/datatransfers/Upload/Data"
+schema:
+  sftp_host: str
+  sftp_port: int
+  sftp_username: str
+  sftp_password: password
+  sftp_directory: str
