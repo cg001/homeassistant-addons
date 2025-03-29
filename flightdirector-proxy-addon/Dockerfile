@@ -5,4 +5,4 @@ RUN apk add --no-cache nginx apache2-utils
 
 COPY rootfs/ /
 
-# Keine CMD, s6-overlay übernimmt Prozessstart
+RUN chmod +x /etc/services.d/nginx/run /etc/services.d/nginx/finish
