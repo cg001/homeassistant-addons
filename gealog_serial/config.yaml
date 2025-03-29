@@ -1,0 +1,27 @@
+name: "GEALOG serial"
+description: "GEALOG serial to MQTT adapter"
+version: "0.2.08"
+slug: "gealog_serial"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+options:
+  serial_ip: 192.168.5.144
+  serial_port: 4196
+  mqtt_broker: core-mosquitto
+  mqtt_port: 1883
+  mqtt_topic: GEALOG
+  mqtt_username: mqtt_loau
+  mqtt_password: loau_685
+schema:
+  serial_ip: str
+  serial_port: int
+  mqtt_broker: str
+  mqtt_port: int
+  mqtt_topic: str
+  mqtt_username: str
+  mqtt_password: password

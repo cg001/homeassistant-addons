@@ -10,6 +10,7 @@
     "flightdirector-proxy-addon",
     "nginx-minimal-addon",
     "nginx-verified-addon",
-    "nginx-proxy-style-addon"
+    "nginx-proxy-style-addon",
+    "flightdirector-proxy"
   ]
 }

@@ -1,0 +1,14 @@
+name: "Flightdirector Proxy"
+version: "0.1.0"
+slug: "flightdirector_proxy"
+description: "Proxy for flightdirector.de with automatic login"
+startup: services
+boot: auto
+ingress: true
+ingress_port: 8080
+init: false
+panel_icon: mdi:airplane
+arch:
+  - amd64
+options: {}
+schema: {}
