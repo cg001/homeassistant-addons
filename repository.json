@@ -7,10 +7,7 @@
     "nginx-verified-addon",
     "flightdirector-proxy",
     "tankdata-sftp-list-addon",
-    "tankdata-sftp-list-addon-debug-012",
-    "tankdata-sftp-list-addon-v013",
-    "tankdata-sftp-list-addon-v014",
-    "tankdata-sftp-list-addon-v015",
-    "tankdata-sftp-test6-addon"
+    "tankdata-sftp-test6-addon",
+    "tankdata-sftp-viewer-addon-017"
   ]
 }
