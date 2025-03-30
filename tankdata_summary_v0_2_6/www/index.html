@@ -15,14 +15,14 @@
 <body>
   <h1>Tankdata – Letzte XML-Transaktionen</h1>
   <p>
-    <form action="/refresh" method="post" style="display: inline;">
+    <form action="{{ url_for('refresh') }}" method="post" style="display: inline;">
       <button type="submit">🔄 Refresh</button>
     </form>
   </p>
   {% for file in files %}
   <h3>{{ file.filename }}</h3>
   <table>
-    <thead><tr><th>ID</th><th>Amount</th><th>Timestamp</th></tr></thead>
+    <thead><tr><th>Transaktion Nr.</th><th>Betrag (EUR)</th><th>Datum/Zeit</th></tr></thead>
     <tbody>
     {% for row in file.transactions %}
       <tr><td>{{ row.id }}</td><td>{{ row.amount }}</td><td>{{ row.timestamp }}</td></tr>

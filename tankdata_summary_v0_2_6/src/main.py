@@ -37,9 +37,9 @@ def fetch_newest_files():
                     transactions = []
                     for txn in root.findall(".//Transaction"):
                         transactions.append({
-                            "id": txn.findtext("ID", ""),
-                            "amount": txn.findtext("Amount", ""),
-                            "timestamp": txn.findtext("Timestamp", "")
+                            "id": txn.findtext("TransactionNumber", ""),
+                            "amount": txn.findtext("TransactionAmount", ""),
+                            "timestamp": txn.findtext("TransactionStartDate", "")
                         })
                     new_data.append({
                         "filename": f.filename,
