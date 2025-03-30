@@ -68,7 +68,9 @@
   <h1>Tankdaten Übersicht</h1>
   <div class="header-line"></div>
   
-  <a href="{{ url_for('refresh') }}" class="reload-btn">RELOAD</a>
+  <form method="post" action="/refresh" style="display: inline;">
+    <button type="submit" class="reload-btn">RELOAD</button>
+  </form>
   
   <div class="last-update">
     Letzte Aktualisierung: {{ last_update if last_update else "Noch nicht aktualisiert" }}

@@ -79,7 +79,7 @@ def fetch_newest_files():
 def index():
     return render_template_string(template_html, files=xml_data_list, last_update=last_update)
 
-@app.route("/refresh")
+@app.route("/refresh", methods=["GET", "POST"])
 def refresh():
     fetch_newest_files()
     return redirect(url_for("index"))
