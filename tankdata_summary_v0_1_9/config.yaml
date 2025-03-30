@@ -1,6 +1,6 @@
 name: "Tankdaten Übersicht v0.1.9"
 version: "0.1.9"
-slug: "tankdata_sftp_test6"
+slug: "tankdata_sftp_test9"
 description: "Listet die letzten 20 XML-Dateien vom SFTP-Server und zeigt sie im Webinterface"
 startup: application
 boot: auto
