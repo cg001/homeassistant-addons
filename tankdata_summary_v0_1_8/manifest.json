@@ -1,0 +1,14 @@
+{
+  "name": "Tankdaten Übersicht v0.1.8",
+  "version": "0.1.8",
+  "slug": "tankdata_summary_v0_1_8",
+  "description": "Listet die letzten 20 XML-Dateien vom SFTP-Server und zeigt sie im Webinterface",
+  "startup": "application",
+  "boot": "auto",
+  "init": false,
+  "panel_icon": "mdi:xml",
+  "panel_title": "Tankdata",
+  "ingress": true,
+  "ingress_port": 8080,
+  "arch": ["amd64"]
+}
