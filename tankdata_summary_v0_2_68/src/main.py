@@ -30,8 +30,13 @@ def fetch_newest_files():
         transport.connect(username=SFTP_USER, password=SFTP_PASS)
         sftp = paramiko.SFTPClient.from_transport(transport)
         sftp.chdir(SFTP_DIR)
+
+        # Sortiere Dateien nach Änderungsdatum, neueste zuerst
         files = sorted(sftp.listdir_attr(), key=lambda x: x.st_mtime, reverse=True)
         new_data = []
+
+        # Temporäre Liste für neue Dateien
+        temp_processed = set()
 
         for f in files:
             if not f.filename.lower().endswith(".xml") or f.filename in processed_files:
@@ -62,12 +67,15 @@ def fetch_newest_files():
                             "quantity": txn.findtext("TransactionQuantity", ""),
                             "license_plate": license_plate
                         })
-                    new_data.append({
-                        "filename": f.filename,
-                        "transactions": transactions
-                    })
-                processed_files.add(f.filename)
-                if len(new_data) + len(xml_data_list) >= 20:
+
+                    if transactions:  # Nur hinzufügen wenn Transaktionen gefunden wurden
+                        new_data.append({
+                            "filename": f.filename,
+                            "transactions": sorted(transactions, key=lambda x: x["timestamp"], reverse=True)
+                        })
+                        temp_processed.add(f.filename)
+
+                if len(new_data) >= 20:  # Limit auf 20 Dateien
                     break
             except Exception as e:
                 print("Fehler beim Parsen:", f.filename, str(e))
@@ -76,7 +84,23 @@ def fetch_newest_files():
         transport.close()
 
         with data_lock:
-            xml_data_list = new_data + xml_data_list
+            # Aktualisiere die processed_files nur mit erfolgreich verarbeiteten Dateien
+            processed_files.update(temp_processed)
+
+            # Sortiere alle Transaktionen nach Zeitstempel
+            all_transactions = []
+            for file_data in new_data:
+                all_transactions.extend(file_data["transactions"])
+
+            # Sortiere nach Zeitstempel und erstelle neue Dateiliste
+            sorted_transactions = sorted(all_transactions, key=lambda x: x["timestamp"], reverse=True)
+
+            # Begrenze auf die neuesten 20 Transaktionen
+            xml_data_list = [{
+                "filename": "combined",
+                "transactions": sorted_transactions[:20]
+            }]
+
             last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
 
         return True
