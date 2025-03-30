@@ -14,12 +14,14 @@ init: false
 hassio_api: true
 homeassistant_api: true
 options:
-  sftp_host: 192.168.5.205
-  sftp_user: tankdaten
-  sftp_password: fsv2000
-  sftp_path: /diskc/datatransfers/Upload/Data
+  sftp_host: "192.168.5.205"
+  sftp_port: 22
+  sftp_username: "tankdaten"
+  sftp_password: "fsv2000"
+  sftp_directory: "/diskc/datatransfers/Upload/Data"
 schema:
   sftp_host: str
-  sftp_user: str
+  sftp_port: int
+  sftp_username: str
   sftp_password: password
-  sftp_path: str
+  sftp_directory: str
