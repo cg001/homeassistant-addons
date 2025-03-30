@@ -1,0 +1,14 @@
+{
+  "name": "Tankdata SFTP Viewer",
+  "version": "0.1.7",
+  "slug": "tankdata_sftp_viewer",
+  "description": "Listet die letzten 20 XML-Dateien vom SFTP-Server und zeigt sie im Webinterface",
+  "startup": "application",
+  "boot": "auto",
+  "init": false,
+  "panel_icon": "mdi:xml",
+  "panel_title": "Tankdata",
+  "ingress": true,
+  "ingress_port": 8080,
+  "arch": ["amd64"]
+}
