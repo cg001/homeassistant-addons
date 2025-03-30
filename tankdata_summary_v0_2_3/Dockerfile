@@ -12,5 +12,3 @@ COPY www/ /app/www/
 
 RUN chmod +x /etc/services.d/test/run
 WORKDIR /app
-
-CMD ["/init"]
