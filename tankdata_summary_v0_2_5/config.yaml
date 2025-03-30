@@ -8,6 +8,7 @@ arch:
   - aarch64
 startup: services
 ingress: true
+ingress_port: 8080
 panel_icon: mdi:gas-station
 boot: auto
 init: false
