@@ -14,13 +14,17 @@
 </head>
 <body>
   <h1>Tankdata – Letzte XML-Transaktionen</h1>
-  <p><button onclick="location.reload()">🔄 Refresh</button></p>
-  {% for file in data %}
+  <p>
+    <form action="/refresh" method="post" style="display: inline;">
+      <button type="submit">🔄 Refresh</button>
+    </form>
+  </p>
+  {% for file in files %}
   <h3>{{ file.filename }}</h3>
   <table>
     <thead><tr><th>ID</th><th>Amount</th><th>Timestamp</th></tr></thead>
     <tbody>
-    {% for row in file.rows %}
+    {% for row in file.transactions %}
       <tr><td>{{ row.id }}</td><td>{{ row.amount }}</td><td>{{ row.timestamp }}</td></tr>
     {% endfor %}
     </tbody>
