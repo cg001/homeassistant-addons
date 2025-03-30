@@ -13,4 +13,4 @@ export SFTP_PASS=$PASS
 export SFTP_DIR=$DIR
 
 echo "▶️ Starte Webserver..."
-exec python3 /app/server.py
+exec python3 /app/main.py
