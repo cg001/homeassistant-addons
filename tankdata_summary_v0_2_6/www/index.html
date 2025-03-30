@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tankdaten Übersicht</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    h1 { font-size: 24px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Tankdata – Letzte XML-Transaktionen</h1>
+  <p>
+    <form action="/refresh" method="post" style="display: inline;">
+      <button type="submit">🔄 Refresh</button>
+    </form>
+  </p>
+  {% for file in files %}
+  <h3>{{ file.filename }}</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Amount</th><th>Timestamp</th></tr></thead>
+    <tbody>
+    {% for row in file.transactions %}
+      <tr><td>{{ row.id }}</td><td>{{ row.amount }}</td><td>{{ row.timestamp }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+</body>
+</html>
