@@ -2,10 +2,12 @@ import os
 import paramiko
 import xml.etree.ElementTree as ET
 from flask import Flask, render_template_string, request, redirect, url_for
+from datetime import datetime
 
 app = Flask(__name__)
 processed_files = set()
 xml_data_list = []
+last_update = None
 
 SFTP_HOST = os.getenv("SFTP_HOST")
 SFTP_PORT = int(os.getenv("SFTP_PORT", "22"))
@@ -18,7 +20,7 @@ with open(template_path) as f:
     template_html = f.read()
 
 def fetch_newest_files():
-    global processed_files, xml_data_list
+    global processed_files, xml_data_list, last_update
     try:
         transport = paramiko.Transport((SFTP_HOST, SFTP_PORT))
         transport.connect(username=SFTP_USER, password=SFTP_PASS)
@@ -36,10 +38,25 @@ def fetch_newest_files():
                     root = ET.fromstring(content)
                     transactions = []
                     for txn in root.findall(".//Transaction"):
+                        # Map article number to fuel type
+                        article_number = txn.findtext(".//ArticleNumber", "")
+                        article_name = "MOGAS"  # Default
+                        if article_number == "1":
+                            article_name = "AVGAS"
+                        
+                        # Get license plate from MediaData
+                        license_plate = ""
+                        media_data = txn.find(".//MediaData")
+                        if media_data is not None:
+                            license_plate = media_data.findtext("AdditionalEntry", "")
+                        
                         transactions.append({
-                            "id": txn.findtext("TransactionNumber", ""),
-                            "amount": txn.findtext("TransactionAmount", ""),
-                            "timestamp": txn.findtext("TransactionStartDate", "")
+                            "number": txn.findtext("TransactionNumber", ""),
+                            "timestamp": txn.findtext("TransactionStartDate", ""),
+                            "dispenser": txn.findtext(".//DispenserNumber", ""),
+                            "article": article_name,
+                            "quantity": txn.findtext("TransactionQuantity", ""),
+                            "license_plate": license_plate
                         })
                     new_data.append({
                         "filename": f.filename,
@@ -54,14 +71,15 @@ def fetch_newest_files():
         sftp.close()
         transport.close()
         xml_data_list = new_data + xml_data_list
+        last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
     except Exception as e:
         print("❌ Fehler beim SFTP-Zugriff:", str(e))
 
 @app.route("/")
 def index():
-    return render_template_string(template_html, files=xml_data_list)
+    return render_template_string(template_html, files=xml_data_list, last_update=last_update)
 
-@app.route("/refresh", methods=["POST"])
+@app.route("/refresh")
 def refresh():
     fetch_newest_files()
     return redirect(url_for("index"))
