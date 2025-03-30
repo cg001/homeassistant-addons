@@ -1,0 +1,25 @@
+
+name: Tankdaten Übersicht v0.2.3
+version: "0.2.3"
+slug: tankdata_summary_v0_2_3
+description: Anzeige der letzten Tanktransaktionen mit Webinterface
+arch:
+  - amd64
+  - aarch64
+startup: services
+ingress: true
+panel_icon: mdi:gas-station
+boot: auto
+init: false
+hassio_api: true
+homeassistant_api: true
+options:
+  sftp_host: 192.168.5.205
+  sftp_user: tankdaten
+  sftp_password: geheim
+  sftp_path: /diskc/datatransfers/Upload/Data
+schema:
+  sftp_host: str
+  sftp_user: str
+  sftp_password: password
+  sftp_path: str
