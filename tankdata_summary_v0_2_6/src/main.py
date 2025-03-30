@@ -1,7 +1,7 @@
 import os
 import paramiko
 import xml.etree.ElementTree as ET
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template_string, request, redirect, url_for, jsonify
 from datetime import datetime
 
 app = Flask(__name__)
@@ -82,6 +82,10 @@ def index():
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
     fetch_newest_files()
+    # Check if this is an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({"success": True, "last_update": last_update})
+    # Otherwise redirect to the index page
     return redirect(url_for("index"))
 
 if __name__ == "__main__":

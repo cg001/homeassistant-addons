@@ -1,7 +1,7 @@
 
-name: Tankdaten Übersicht v0.2.63
-version: "0.2.63"
-slug: tankdata_summary_v0_2_63
+name: Tankdaten Übersicht v0.2.64
+version: "0.2.64"
+slug: tankdata_summary_v0_2_64
 description: Anzeige der letzten Tanktransaktionen mit Webinterface
 arch:
   - amd64

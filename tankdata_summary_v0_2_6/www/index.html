@@ -68,9 +68,7 @@
   <h1>Tankdaten Übersicht</h1>
   <div class="header-line"></div>
   
-  <form method="post" action="/refresh" style="display: inline;">
-    <button type="submit" class="reload-btn">RELOAD</button>
-  </form>
+  <button onclick="window.location.reload()" class="reload-btn">RELOAD</button>
   
   <div class="last-update">
     Letzte Aktualisierung: {{ last_update if last_update else "Noch nicht aktualisiert" }}
@@ -106,5 +104,41 @@
   <div class="footer">
     © 2025 FSV Tankdaten Reader
   </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const reloadBtn = document.querySelector('.reload-btn');
+      reloadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        reloadBtn.textContent = "LOADING...";
+        reloadBtn.disabled = true;
+        
+        // First, try to fetch new data
+        fetch('/refresh', {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error('Network response was not ok');
+        })
+        .then(data => {
+          // Reload the page to show the new data
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // If there's an error, just reload the page
+          window.location.reload();
+        });
+      });
+    });
+  </script>
 </body>
 </html>
