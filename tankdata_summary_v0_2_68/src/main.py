@@ -87,9 +87,14 @@ def fetch_newest_files():
             # Aktualisiere die processed_files nur mit erfolgreich verarbeiteten Dateien
             processed_files.update(temp_processed)
 
+            # Füge neue Daten hinzu, ohne alte zu überschreiben
+            for new_file in new_data:
+                if new_file["filename"] not in [f["filename"] for f in xml_data_list]:
+                    xml_data_list.append(new_file)
+
             # Sortiere alle Transaktionen nach Zeitstempel
             all_transactions = []
-            for file_data in new_data:
+            for file_data in xml_data_list:
                 all_transactions.extend(file_data["transactions"])
 
             # Sortiere nach Zeitstempel und erstelle neue Dateiliste
