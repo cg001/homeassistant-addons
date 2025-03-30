@@ -7,7 +7,7 @@ RUN apk add --no-cache python3 py3-pip openssh
 RUN pip3 install --break-system-packages flask paramiko
 
 COPY rootfs/ /
-COPY src/ /app/
+COPY src/ /app/src/
 COPY www/ /app/www/
 
 RUN chmod +x /etc/services.d/test/run
