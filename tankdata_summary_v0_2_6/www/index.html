@@ -108,6 +108,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const reloadBtn = document.querySelector('.reload-btn');
+      const lastUpdateEl = document.querySelector('.last-update');
+      
       reloadBtn.addEventListener('click', function(e) {
         e.preventDefault();
         
@@ -115,11 +117,15 @@
         reloadBtn.textContent = "LOADING...";
         reloadBtn.disabled = true;
         
+        // Add cache-busting parameter
+        const timestamp = new Date().getTime();
+        
         // First, try to fetch new data
-        fetch('/refresh', {
+        fetch(`/refresh?_=${timestamp}`, {
           method: 'GET',
           headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'Cache-Control': 'no-cache'
           }
         })
         .then(response => {
@@ -129,11 +135,23 @@
           throw new Error('Network response was not ok');
         })
         .then(data => {
+          // Update the last update timestamp directly
+          if (data.last_update) {
+            lastUpdateEl.textContent = `Letzte Aktualisierung: ${data.last_update}`;
+          }
+          
+          // Reset button state
+          reloadBtn.textContent = "RELOAD";
+          reloadBtn.disabled = false;
+          
           // Reload the page to show the new data
           window.location.reload();
         })
         .catch(error => {
           console.error('Error:', error);
+          // Reset button state
+          reloadBtn.textContent = "RELOAD";
+          reloadBtn.disabled = false;
           // If there's an error, just reload the page
           window.location.reload();
         });

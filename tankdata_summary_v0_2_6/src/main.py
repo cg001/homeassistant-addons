@@ -83,12 +83,27 @@ def index():
 def refresh():
     # Always update the timestamp, even if no new files are found
     global last_update
+    
+    # Force update the timestamp
+    current_time = datetime.now()
+    last_update = current_time.strftime("%d.%m.%Y, %H:%M:%S")
+    
+    # Then fetch new files
     fetch_newest_files()
-    last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
     
     # Check if this is an AJAX request
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({"success": True, "last_update": last_update})
+        # Add a cache-busting header
+        response = jsonify({
+            "success": True, 
+            "last_update": last_update,
+            "timestamp": current_time.timestamp()
+        })
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
+    
     # Otherwise redirect to the index page
     return redirect(url_for("index"))
 
