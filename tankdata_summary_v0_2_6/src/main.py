@@ -81,7 +81,11 @@ def index():
 
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
+    # Always update the timestamp, even if no new files are found
+    global last_update
     fetch_newest_files()
+    last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
+    
     # Check if this is an AJAX request
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({"success": True, "last_update": last_update})
