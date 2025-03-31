@@ -1,14 +1,15 @@
 
-name: Tankdaten Übersicht v0.2.612
-version: "0.2.612"
-slug: tankdata_summary_v0_2_612
+name: Tankdaten Übersicht v0.2.613
+version: "0.2.613"
+slug: tankdata_summary_v0_2_613
 description: Anzeige der letzten Tanktransaktionen mit Webinterface
 arch:
   - amd64
   - aarch64
 startup: services
-ingress: true
-ingress_port: 8080
+ingress: false
+ports:
+  8088/tcp: 8088
 panel_icon: mdi:gas-station
 boot: auto
 init: false
