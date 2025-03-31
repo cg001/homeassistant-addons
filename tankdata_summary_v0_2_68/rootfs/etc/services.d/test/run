@@ -15,4 +15,12 @@ export SFTP_DIR=$DIR
 export REFRESH_INTERVAL=$REFRESH
 
 echo "▶️ Starte Webserver..."
-exec python3 /app/main.py
+
+# Starte Flask-Server im Hintergrund
+python3 /app/main.py &
+
+# Warte kurz, damit der Flask-Server Zeit hat zu starten
+sleep 2
+
+# Starte NGINX als Hauptprozess
+exec nginx -g "daemon off;"
