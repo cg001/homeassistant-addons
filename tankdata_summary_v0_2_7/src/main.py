@@ -1,12 +1,26 @@
 import os
+import paramiko
+import xml.etree.ElementTree as ET
+from flask import Flask, render_template_string, request, redirect, url_for, jsonify
+from datetime import datetime
+import threading
 import time
 import json
 import paho.mqtt.client as mqtt
-from flask import Flask, render_template
-from sftp_handler import fetch_latest_xml  # Deine bestehende SFTP-Logik
-from xml_parser import parse_xml_to_table  # Deine bestehende XML-Parsing-Logik
 
 app = Flask(__name__)
+processed_files = set()
+xml_data_list = []
+last_update = None
+data_lock = threading.Lock()  # Thread-safe Zugriff auf die Daten
+
+# SFTP-Konfiguration
+SFTP_HOST = os.getenv("SFTP_HOST")
+SFTP_PORT = int(os.getenv("SFTP_PORT", "22"))
+SFTP_USER = os.getenv("SFTP_USER")
+SFTP_PASS = os.getenv("SFTP_PASS")
+SFTP_DIR = os.getenv("SFTP_DIR")
+REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", "60"))  # Default to 60 seconds
 
 # MQTT-Konfiguration
 MQTT_BROKER = os.getenv("MQTT_BROKER", "192.168.5.100")
@@ -18,53 +32,134 @@ MQTT_TOPIC = "tankdaten"
 # MQTT-Client einrichten
 mqtt_client = mqtt.Client()
 mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+try:
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    mqtt_client.loop_start()  # Startet MQTT-Loop im Hintergrund
+    print(f"✅ Verbunden mit MQTT-Broker: {MQTT_BROKER}:{MQTT_PORT}")
+except Exception as e:
+    print(f"❌ Fehler beim Verbinden mit MQTT-Broker: {e}")
 
-# Globale Variable für die HTML-Tabelle
-html_table = ""
-last_processed_file = None
-
-@app.route("/")
-def index():
-    global html_table
-    return html_table
+template_path = os.path.join(os.path.dirname(__file__), "www", "index.html")
+with open(template_path) as f:
+    template_html = f.read()
 
 def send_to_mqtt(data):
     """Sendet die geparsten Daten an MQTT."""
     try:
         mqtt_client.publish(MQTT_TOPIC, json.dumps(data))
-        print(f"✅ Daten an MQTT gesendet: {data}")
+        print(f"✅ Daten an MQTT gesendet: {len(data['transactions'])} Transaktionen")
     except Exception as e:
         print(f"❌ Fehler beim Senden an MQTT: {e}")
 
-def refresh_data():
-    """Aktualisiert die Daten, wenn eine neue XML-Datei erkannt wird."""
-    global html_table, last_processed_file
+def fetch_newest_files():
+    global processed_files, xml_data_list, last_update
+    try:
+        transport = paramiko.Transport((SFTP_HOST, SFTP_PORT))
+        transport.connect(username=SFTP_USER, password=SFTP_PASS)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        sftp.chdir(SFTP_DIR)
 
-    # Neueste XML-Datei abrufen
-    latest_file = fetch_latest_xml()
-    if latest_file != last_processed_file:
-        print(f"📂 Neue Datei erkannt: {latest_file}")
-        last_processed_file = latest_file
+        # Sortiere Dateien nach Änderungsdatum, neueste zuerst
+        files = sorted(sftp.listdir_attr(), key=lambda x: x.st_mtime, reverse=True)
+        new_data = []
+        new_files_found = False
 
-        # XML-Datei parsen
-        parsed_data = parse_xml_to_table(latest_file)
-        html_table = render_template("table.html", data=parsed_data)
+        # Temporäre Liste für neue Dateien
+        temp_processed = set()
 
-        # Daten an MQTT senden
-        send_to_mqtt(parsed_data)
-    else:
-        print("🔄 Keine neue Datei gefunden.")
+        for f in files:
+            if not f.filename.lower().endswith(".xml") or f.filename in processed_files:
+                continue
+            new_files_found = True
+            try:
+                with sftp.open(f.filename) as file_obj:
+                    content = file_obj.read().decode()
+                    root = ET.fromstring(content)
+                    transactions = []
+                    for txn in root.findall(".//Transaction"):
+                        # Map article number to fuel type
+                        article_number = txn.findtext(".//ArticleNumber", "")
+                        article_name = "MOGAS"  # Default
+                        if article_number == "1":
+                            article_name = "AVGAS"
 
-# Hintergrund-Thread für automatische Aktualisierung
-def background_refresh():
-    while True:
-        refresh_data()
-        time.sleep(int(os.getenv("REFRESH_INTERVAL", 3600)))
+                        # Get license plate from MediaData
+                        license_plate = ""
+                        media_data = txn.find(".//MediaData")
+                        if media_data is not None:
+                            license_plate = media_data.findtext("AdditionalEntry", "")
+
+                        transactions.append({
+                            "number": txn.findtext("TransactionNumber", ""),
+                            "timestamp": txn.findtext("TransactionStartDate", ""),
+                            "dispenser": txn.findtext(".//DispenserNumber", ""),
+                            "article": article_name,
+                            "quantity": txn.findtext("TransactionQuantity", ""),
+                            "license_plate": license_plate
+                        })
+
+                    if transactions:  # Nur hinzufügen wenn Transaktionen gefunden wurden
+                        new_data.append({
+                            "filename": f.filename,
+                            "transactions": sorted(transactions, key=lambda x: x["timestamp"], reverse=True)
+                        })
+                        temp_processed.add(f.filename)
+
+                if len(new_data) >= 20:  # Limit auf 20 Dateien
+                    break
+            except Exception as e:
+                print("Fehler beim Parsen:", f.filename, str(e))
+
+        sftp.close()
+        transport.close()
+
+        with data_lock:
+            # Aktualisiere die processed_files nur mit erfolgreich verarbeiteten Dateien
+            processed_files.update(temp_processed)
+
+            # Füge neue Daten hinzu, ohne alte zu überschreiben
+            for new_file in new_data:
+                if new_file["filename"] not in [f["filename"] for f in xml_data_list]:
+                    xml_data_list.append(new_file)
+
+            # Sortiere alle Transaktionen nach Zeitstempel
+            all_transactions = []
+            for file_data in xml_data_list:
+                all_transactions.extend(file_data["transactions"])
+
+            # Sortiere nach Zeitstempel und erstelle neue Dateiliste
+            sorted_transactions = sorted(all_transactions, key=lambda x: x["timestamp"], reverse=True)
+
+            # Begrenze auf die neuesten 20 Transaktionen
+            combined_data = {
+                "filename": "combined",
+                "transactions": sorted_transactions[:20]
+            }
+            xml_data_list = [combined_data]
+
+            last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
+
+            # Wenn neue Dateien gefunden wurden, sende die Daten an MQTT
+            if new_files_found:
+                send_to_mqtt(combined_data)
+
+        return True
+    except Exception as e:
+        print("❌ Fehler beim SFTP-Zugriff:", str(e))
+        return False
+
+# ... Rest des Codes bleibt unverändert ...
 
 if __name__ == "__main__":
-    import threading
-    # Hintergrund-Thread starten
-    threading.Thread(target=background_refresh, daemon=True).start()
-    # Flask-Server starten
+    # Set initial timestamp
+    last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
+
+    # Fetch initial files
+    fetch_newest_files()
+
+    # Start background refresh thread
+    refresh_thread = threading.Thread(target=background_refresh, daemon=True)
+    refresh_thread.start()
+
+    # Start the Flask app
     app.run(host="0.0.0.0", port=8088)
