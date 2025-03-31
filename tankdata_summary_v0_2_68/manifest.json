@@ -1,8 +1,8 @@
 
 {
-  "name": "Tankdaten Übersicht v0.2.611",
-  "version": "0.2.611",
-  "slug": "tankdata_summary_v0_2_611",
+  "name": "Tankdaten Übersicht v0.2.612",
+  "version": "0.2.612",
+  "slug": "tankdata_summary_v0_2_612",
   "description": "Anzeige der letzten Tanktransaktionen mit Webinterface",
   "arch": ["amd64", "aarch64"],
   "startup": "services",
