@@ -86,6 +86,9 @@ def fetch_newest_files():
                         media_data = txn.find(".//MediaData")
                         if media_data is not None:
                             license_plate = media_data.findtext("AdditionalEntry", "")
+                        quantity = txn.findtext("TransactionQuantity", "")
+                        if quantity:
+                            quantity = quantity.replace('.', ',')
 
                         transactions.append({
                             "number": txn.findtext("TransactionNumber", ""),
