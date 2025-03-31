@@ -8,7 +8,6 @@ arch:
   - aarch64
 startup: services
 ingress: true
-ingress_port: 8080
 panel_icon: mdi:gas-station
 boot: auto
 init: false
@@ -22,7 +21,7 @@ options:
   sftp_username: "tankdaten"
   sftp_password: "fsv2000"
   sftp_directory: "/diskc/datatransfers/Upload/Data"
-  refresh_interval: 60
+  refresh_interval: 3600
 schema:
   sftp_host: str
   sftp_port: int
