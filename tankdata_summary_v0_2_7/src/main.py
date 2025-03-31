@@ -14,12 +14,11 @@ xml_data_list = []
 last_update = None
 data_lock = threading.Lock()  # Thread-safe Zugriff auf die Daten
 
-# SFTP-Konfiguration
 SFTP_HOST = os.getenv("SFTP_HOST")
 SFTP_PORT = int(os.getenv("SFTP_PORT", "22"))
-SFTP_USER = os.getenv("SFTP_USERNAME")  # Angepasst an config.yaml
-SFTP_PASS = os.getenv("SFTP_PASSWORD")  # Angepasst an config.yaml
-SFTP_DIR = os.getenv("SFTP_DIRECTORY")  # Angepasst an config.yaml
+SFTP_USER = os.getenv("SFTP_USER")
+SFTP_PASS = os.getenv("SFTP_PASS")
+SFTP_DIR = os.getenv("SFTP_DIR")
 REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", "60"))  # Default to 60 seconds
 
 # MQTT-Konfiguration
@@ -30,23 +29,14 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "loau_685")
 MQTT_TOPIC = "tankdaten"
 
 # MQTT-Client einrichten
-mqtt_client = mqtt.Client(client_id="tankdaten_addon", protocol=mqtt.MQTTv5)
+mqtt_client = mqtt.Client()
 mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-
-# MQTT-Verbindung mit Fehlerbehandlung
-mqtt_connected = False
-def connect_mqtt():
-    global mqtt_connected
-    try:
-        mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-        mqtt_client.loop_start()
-        mqtt_connected = True
-        print(f"✅ Verbunden mit MQTT-Broker: {MQTT_BROKER}:{MQTT_PORT}")
-    except Exception as e:
-        print(f"❌ Fehler beim Verbinden mit MQTT-Broker: {e}")
-        mqtt_connected = False
-
-connect_mqtt()
+try:
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    mqtt_client.loop_start()
+    print(f"✅ Verbunden mit MQTT-Broker: {MQTT_BROKER}:{MQTT_PORT}")
+except Exception as e:
+    print(f"❌ Fehler beim Verbinden mit MQTT-Broker: {e}")
 
 template_path = os.path.join(os.path.dirname(__file__), "www", "index.html")
 with open(template_path) as f:
@@ -54,17 +44,11 @@ with open(template_path) as f:
 
 def send_to_mqtt(data):
     """Sendet die geparsten Daten an MQTT."""
-    global mqtt_connected
-    if not mqtt_connected:
-        print("⚠️ Keine MQTT-Verbindung verfügbar, versuche neu zu verbinden...")
-        connect_mqtt()
-    if mqtt_connected:
-        try:
-            mqtt_client.publish(MQTT_TOPIC, json.dumps(data))
-            print(f"✅ Daten an MQTT gesendet: {len(data['transactions'])} Transaktionen")
-        except Exception as e:
-            print(f"❌ Fehler beim Senden an MQTT: {e}")
-            mqtt_connected = False
+    try:
+        mqtt_client.publish(MQTT_TOPIC, json.dumps(data))
+        print(f"✅ Daten an MQTT gesendet: {len(data['transactions'])} Transaktionen")
+    except Exception as e:
+        print(f"❌ Fehler beim Senden an MQTT: {e}")
 
 def fetch_newest_files():
     global processed_files, xml_data_list, last_update
@@ -77,7 +61,6 @@ def fetch_newest_files():
         # Sortiere Dateien nach Änderungsdatum, neueste zuerst
         files = sorted(sftp.listdir_attr(), key=lambda x: x.st_mtime, reverse=True)
         new_data = []
-        new_files_found = False
 
         # Temporäre Liste für neue Dateien
         temp_processed = set()
@@ -85,7 +68,6 @@ def fetch_newest_files():
         for f in files:
             if not f.filename.lower().endswith(".xml") or f.filename in processed_files:
                 continue
-            new_files_found = True
             try:
                 with sftp.open(f.filename) as file_obj:
                     content = file_obj.read().decode()
@@ -146,17 +128,15 @@ def fetch_newest_files():
             sorted_transactions = sorted(all_transactions, key=lambda x: x["timestamp"], reverse=True)
 
             # Begrenze auf die neuesten 20 Transaktionen
-            combined_data = {
+            xml_data_list = [{
                 "filename": "combined",
                 "transactions": sorted_transactions[:20]
-            }
-            xml_data_list = [combined_data]
+            }]
+
+            # Sende Daten an MQTT
+            send_to_mqtt(xml_data_list[0])
 
             last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
-
-            # Wenn neue Dateien gefunden wurden, sende die Daten an MQTT
-            if new_files_found:
-                send_to_mqtt(combined_data)
 
         return True
     except Exception as e:
@@ -166,8 +146,8 @@ def fetch_newest_files():
 def background_refresh():
     """Background task für automatisches Refresh"""
     while True:
-        fetch_newest_files()
         time.sleep(REFRESH_INTERVAL)
+        fetch_newest_files()
 
 @app.route("/")
 def index():
