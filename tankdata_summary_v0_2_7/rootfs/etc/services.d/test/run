@@ -1,0 +1,26 @@
+#!/usr/bin/with-contenv bashio
+
+HOST=$(bashio::config 'sftp_host')
+PORT=$(bashio::config 'sftp_port')
+USER=$(bashio::config 'sftp_username')
+PASS=$(bashio::config 'sftp_password')
+DIR=$(bashio::config 'sftp_directory')
+REFRESH=$(bashio::config 'refresh_interval')
+
+export SFTP_HOST=$HOST
+export SFTP_PORT=$PORT
+export SFTP_USER=$USER
+export SFTP_PASS=$PASS
+export SFTP_DIR=$DIR
+export REFRESH_INTERVAL=$REFRESH
+
+echo "▶️ Starte Webserver..."
+
+# Starte Flask-Server im Hintergrund
+python3 /app/main.py &
+
+# Warte kurz, damit der Flask-Server Zeit hat zu starten
+sleep 2
+
+# Starte NGINX als Hauptprozess
+exec nginx -c /etc/nginx/nginx.conf -g "daemon off;"

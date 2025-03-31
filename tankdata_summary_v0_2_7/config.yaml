@@ -1,0 +1,39 @@
+
+name: Tankdaten Übersicht v0.2.7
+version: "0.2.7"
+slug: tankdata_summary_v0_2_7
+description: Anzeige der letzten Tanktransaktionen mit Webinterface
+arch:
+  - amd64
+  - aarch64
+startup: services
+ingress: true
+panel_icon: mdi:gas-station
+boot: auto
+init: false
+hassio_api: true
+homeassistant_api: true
+ports:
+  8088/tcp: 8088
+options:
+  sftp_host: "192.168.5.205"
+  sftp_port: 22
+  sftp_username: "tankdaten"
+  sftp_password: "fsv2000"
+  sftp_directory: "/diskc/datatransfers/Upload/Data"
+  refresh_interval: 3600
+  mqtt_broker: "core-mosquitto"
+  mqtt_port: 1883
+  mqtt_username: "mqtt_loau"
+  mqtt_password: "loau_685"
+schema:
+  sftp_host: str
+  sftp_port: int
+  sftp_username: str
+  sftp_password: password
+  sftp_directory: str
+  refresh_interval: int(0,3600)
+  mqtt_broker: str
+  mqtt_port: int
+  mqtt_username: str
+  mqtt_password: str

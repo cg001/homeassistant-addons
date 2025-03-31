@@ -1,0 +1,12 @@
+
+{
+  "name": "Tankdaten Übersicht v0.2.7",
+  "version": "0.2.7",
+  "slug": "tankdata_summary_v0_2_7",
+  "description": "Anzeige der letzten Tanktransaktionen mit Webinterface",
+  "arch": ["amd64", "aarch64"],
+  "startup": "services",
+  "boot": "auto",
+  "ingress": true,
+  "panel_icon": "mdi:gas-station"
+}
