@@ -11,7 +11,10 @@ RUN apk add --no-cache \
     nginx
 
 # Installiere Python-Pakete
-RUN pip3 install --break-system-packages flask paramiko
+RUN pip3 install --break-system-packages \
+    flask \
+    paramiko \
+    paho-mqtt
 
 # Kopiere Dateien
 COPY rootfs/ /
