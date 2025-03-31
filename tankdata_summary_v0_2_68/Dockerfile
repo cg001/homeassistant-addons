@@ -17,7 +17,7 @@ RUN pip3 install --break-system-packages flask paramiko
 COPY rootfs/ /
 COPY src/ /app/
 COPY www/ /app/www/
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY /rootfs/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Setze Berechtigungen für die run-Datei
 RUN chmod +x /etc/services.d/test/run
