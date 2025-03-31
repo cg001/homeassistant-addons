@@ -29,10 +29,11 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "loau_685")
 MQTT_TOPIC = "tankdaten"
 
 # MQTT-Client einrichten
-mqtt_client = mqtt.Client()
+mqtt_client = mqtt.Client(client_id="tankdaten_addon")  # Explizite client_id setzen
 mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
+mqtt_client.enable_logger()  # Debugging aktivieren
 try:
-    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=30)  # Keep-Alive auf 30 Sekunden setzen
     mqtt_client.loop_start()
     print(f"✅ Verbunden mit MQTT-Broker: {MQTT_BROKER}:{MQTT_PORT}")
 except Exception as e:
