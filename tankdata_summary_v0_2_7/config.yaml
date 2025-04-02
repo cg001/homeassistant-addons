@@ -5,7 +5,10 @@ slug: tankdata_summary_v0_2_7
 description: Anzeige der letzten Tanktransaktionen mit Webinterface
 arch:
   - amd64
+  - armv7
+  - armhf
   - aarch64
+  - i386
 startup: application
 ingress: true
 panel_icon: mdi:gas-station
@@ -13,6 +16,8 @@ boot: auto
 init: false
 hassio_api: true
 homeassistant_api: true
+map:
+  - ssl:rw
 ports:
   8088/tcp: 8088
 options:
