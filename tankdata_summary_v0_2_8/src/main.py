@@ -1,7 +1,7 @@
 import os
 import paramiko
 import xml.etree.ElementTree as ET
-from flask import Flask, render_template_string, request, redirect, url_for, jsonify
+from flask import Flask, render_template_string, request, redirect, url_for, jsonify, make_response
 from datetime import datetime
 import threading
 import time
@@ -14,6 +14,21 @@ app = Flask(__name__, static_url_path='')
 # Configure for running behind a proxy with a path prefix (for Home Assistant ingress)
 app.config['APPLICATION_ROOT'] = '/'
 app.config['PREFERRED_URL_SCHEME'] = 'https'
+
+# Function to add CORS headers to responses
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-Forwarded-For,X-Forwarded-Proto,X-Real-IP'
+    return response
+
+# Handle CORS preflight requests
+@app.route('/', methods=['OPTIONS'])
+@app.route('/<path:path>', methods=['OPTIONS'])
+def options_handler(path=None):
+    response = make_response()
+    response = add_cors_headers(response)
+    return response
 processed_files = set()
 xml_data_list = []
 last_update = None
@@ -161,23 +176,28 @@ def background_refresh():
 @app.route("/")
 def index():
     # Add cache-control headers to prevent caching
-    response = render_template_string(
+    response = make_response(render_template_string(
         template_html,
         files=xml_data_list,
         last_update=last_update,
         refresh_interval=REFRESH_INTERVAL
-    )
+    ))
+    # Add CORS headers
+    response = add_cors_headers(response)
     return response
 
 @app.route("/api/data")
 def get_data():
     """API endpoint für AJAX requests"""
     with data_lock:
-        return jsonify({
+        response = jsonify({
             "success": True,
             "files": xml_data_list,
             "last_update": last_update
         })
+        # Add CORS headers
+        response = add_cors_headers(response)
+        return response
 
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
@@ -186,14 +206,22 @@ def refresh():
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         # Wenn AJAX Request, JSON zurückgeben
-        return jsonify({
+        response = jsonify({
             "success": success,
             "files": xml_data_list,
             "last_update": last_update
         })
+        # Add CORS headers
+        response = add_cors_headers(response)
+        return response
 
     # Wenn normaler Request, zur Hauptseite zurückleiten
     return redirect(url_for('index'))
+
+# Add CORS headers to all responses
+@app.after_request
+def after_request(response):
+    return add_cors_headers(response)
 
 if __name__ == "__main__":
     # Set initial timestamp

@@ -6,6 +6,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: sans-serif;
@@ -71,15 +73,31 @@
         }
     </style>
     <script>
+        // Get base URL for API calls that works with both local and cloud access
+        function getBaseUrl() {
+            // Use the current path as the base URL
+            return window.location.pathname.endsWith('/') 
+                ? window.location.pathname 
+                : window.location.pathname + '/';
+        }
+
         async function refreshData() {
             try {
+                // Use relative URL that works with both local and cloud access
                 const response = await fetch('api/data', {
                     method: 'GET',
                     headers: {
                         'Cache-Control': 'no-cache',
                         'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    },
+                    // Add credentials to handle cloud authentication
+                    credentials: 'same-origin'
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 if (data.success) {
                     updateTable(data.files);
@@ -88,6 +106,9 @@
                 }
             } catch (error) {
                 console.error('Fehler beim Aktualisieren:', error);
+                // Show error message to user
+                document.querySelector('.last-update').textContent = 
+                    'Fehler beim Aktualisieren: ' + error.message;
             }
         }
 
@@ -95,16 +116,26 @@
             const tbody = document.querySelector('tbody');
             tbody.innerHTML = '';
             
+            if (!files || files.length === 0) {
+                // Handle empty data
+                tbody.innerHTML = '<tr><td colspan="6">Keine Daten verfügbar</td></tr>';
+                return;
+            }
+            
             files.forEach(file => {
+                if (!file.transactions || file.transactions.length === 0) {
+                    return;
+                }
+                
                 file.transactions.forEach(row => {
                     tbody.innerHTML += `
                         <tr>
-                            <td>${row.number}</td>
-                            <td>${row.timestamp}</td>
-                            <td>${row.dispenser}</td>
-                            <td>${row.article}</td>
-                            <td>${row.quantity}</td>
-                            <td>${row.license_plate}</td>
+                            <td>${row.number || '-'}</td>
+                            <td>${row.timestamp || '-'}</td>
+                            <td>${row.dispenser || '-'}</td>
+                            <td>${row.article || '-'}</td>
+                            <td>${row.quantity || '-'}</td>
+                            <td>${row.license_plate || '-'}</td>
                         </tr>
                     `;
                 });
@@ -113,20 +144,37 @@
 
         // Initialisierung
         document.addEventListener('DOMContentLoaded', () => {
+            // Initial data load
+            refreshData().catch(err => console.error('Initial load failed:', err));
+            
             // Refresh-Button Event Listener
             document.querySelector('.reload-btn').addEventListener('click', async (e) => {
                 e.preventDefault();
-                const response = await fetch('refresh', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                try {
+                    const response = await fetch('refresh', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        // Add credentials to handle cloud authentication
+                        credentials: 'same-origin'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                });
-                const data = await response.json();
-                if (data.success) {
-                    updateTable(data.files);
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        updateTable(data.files);
+                        document.querySelector('.last-update').textContent = 
+                            'Letzte Aktualisierung: ' + data.last_update;
+                    }
+                } catch (error) {
+                    console.error('Fehler beim manuellen Refresh:', error);
+                    // Show error message to user
                     document.querySelector('.last-update').textContent = 
-                        'Letzte Aktualisierung: ' + data.last_update;
+                        'Fehler beim manuellen Refresh: ' + error.message;
                 }
             });
 
