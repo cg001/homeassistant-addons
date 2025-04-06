@@ -22,7 +22,7 @@ ports:
   8088/tcp: 8088
 options:
   sftp_host: "192.168.5.205"
-  sftp_port: 22d
+  sftp_port: 22
   sftp_username: "tankdaten"
   sftp_password: "fsv2000"
   sftp_directory: "/diskc/datatransfers/Upload/Data"

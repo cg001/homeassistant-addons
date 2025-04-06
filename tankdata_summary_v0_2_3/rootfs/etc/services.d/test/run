@@ -1,3 +1,0 @@
-#!/usr/bin/with-contenv bash
-echo "▶️ Starte Webserver..."
-exec python3 /app/src/main.py
