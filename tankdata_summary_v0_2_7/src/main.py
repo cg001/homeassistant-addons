@@ -95,7 +95,7 @@ def fetch_newest_files():
                             "timestamp": txn.findtext("TransactionStartDate", ""),
                             "dispenser": txn.findtext(".//DispenserNumber", ""),
                             "article": article_name,
-                            "quantity": quantity,  # Hier die formatierte quantity verwenden!
+                            "quantity": txn.findtext("TransactionQuantity", ""),
                             "license_plate": license_plate
                         })
 
