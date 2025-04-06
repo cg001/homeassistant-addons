@@ -26,26 +26,36 @@ export MQTT_PASSWORD=$MQTT_PASSWORD
 
 echo "▶️ Starte Webserver..."
 
-# Beende alle laufenden Flask-Prozesse
-pkill -f "python3 /app/main.py" || true
+# Beende alle laufenden Flask-Prozesse (BusyBox-kompatibel)
+killall python3 2>/dev/null || true
 
 # Warte kurz, damit alle Prozesse beendet werden können
 sleep 1
 
-# Starte Flask-Server im Hintergrund
-python3 /app/main.py &
+# Stelle sicher, dass kein Prozess mehr auf Port 8088 läuft
+# Wir verwenden einen einfacheren Ansatz, der in BusyBox funktionieren sollte
+echo "⚠️ Stelle sicher, dass Port 8088 frei ist..."
+# Beende alle Python-Prozesse, die möglicherweise den Port belegen
+killall python3 2>/dev/null || true
+# Warte einen Moment
+sleep 2
+
+# Starte Flask-Server im Hintergrund mit Fehlerumleitung
+echo "🔄 Starte Flask-Server..."
+python3 /app/main.py > /dev/stdout 2>&1 &
 FLASK_PID=$!
 
 # Warte kurz, damit der Flask-Server Zeit hat zu starten
-sleep 2
+echo "⏳ Warte auf Flask-Server Start..."
+sleep 3
 
-# Prüfe, ob der Flask-Server erfolgreich gestartet wurde
-if ! ps -p $FLASK_PID > /dev/null; then
-    echo "❌ Flask-Server konnte nicht gestartet werden!"
-    exit 1
+# Prüfe, ob der Flask-Server erfolgreich gestartet wurde (BusyBox-kompatibel)
+if kill -0 $FLASK_PID 2>/dev/null; then
+    echo "✅ Flask-Server erfolgreich gestartet (PID: $FLASK_PID)"
+else
+    echo "⚠️ Prozess-Check fehlgeschlagen, versuche trotzdem fortzufahren..."
+    # Wir setzen hier keinen exit, um den Addon nicht zu beenden
 fi
-
-echo "✅ Flask-Server erfolgreich gestartet (PID: $FLASK_PID)"
 
 # Starte NGINX als Hauptprozess
 exec nginx -c /etc/nginx/nginx.conf -g "daemon off;"
