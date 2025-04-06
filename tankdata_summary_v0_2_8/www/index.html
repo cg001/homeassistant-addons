@@ -73,30 +73,14 @@
         }
     </style>
     <script>
-        // Get base URL for API calls that works with both local and cloud access
-        function getBaseUrl() {
-            // Use the current path as the base URL
-            return window.location.pathname.endsWith('/') 
-                ? window.location.pathname 
-                : window.location.pathname + '/';
-        }
-
         async function refreshData() {
             try {
-                // Use relative URL that works with both local and cloud access
                 const response = await fetch('api/data', {
                     method: 'GET',
                     headers: {
-                        'Cache-Control': 'no-cache',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    // Add credentials to handle cloud authentication
-                    credentials: 'same-origin'
+                        'Cache-Control': 'no-cache'
+                    }
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 
                 const data = await response.json();
                 if (data.success) {
@@ -106,9 +90,8 @@
                 }
             } catch (error) {
                 console.error('Fehler beim Aktualisieren:', error);
-                // Show error message to user
                 document.querySelector('.last-update').textContent = 
-                    'Fehler beim Aktualisieren: ' + error.message;
+                    'Fehler beim Aktualisieren: ' + error;
             }
         }
 
@@ -117,7 +100,6 @@
             tbody.innerHTML = '';
             
             if (!files || files.length === 0) {
-                // Handle empty data
                 tbody.innerHTML = '<tr><td colspan="6">Keine Daten verfügbar</td></tr>';
                 return;
             }
@@ -145,37 +127,25 @@
         // Initialisierung
         document.addEventListener('DOMContentLoaded', () => {
             // Initial data load
-            refreshData().catch(err => console.error('Initial load failed:', err));
+            refreshData();
             
             // Refresh-Button Event Listener
-            document.querySelector('.reload-btn').addEventListener('click', async (e) => {
+            document.querySelector('.reload-btn').addEventListener('click', (e) => {
                 e.preventDefault();
-                try {
-                    const response = await fetch('refresh', {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        // Add credentials to handle cloud authentication
-                        credentials: 'same-origin'
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        updateTable(data.files);
+                fetch('refresh', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateTable(data.files);
+                            document.querySelector('.last-update').textContent = 
+                                'Letzte Aktualisierung: ' + data.last_update;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fehler beim manuellen Refresh:', error);
                         document.querySelector('.last-update').textContent = 
-                            'Letzte Aktualisierung: ' + data.last_update;
-                    }
-                } catch (error) {
-                    console.error('Fehler beim manuellen Refresh:', error);
-                    // Show error message to user
-                    document.querySelector('.last-update').textContent = 
-                        'Fehler beim manuellen Refresh: ' + error.message;
-                }
+                            'Fehler beim manuellen Refresh: ' + error;
+                    });
             });
 
             // Auto-Refresh starten

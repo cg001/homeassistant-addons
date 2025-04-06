@@ -26,11 +26,26 @@ export MQTT_PASSWORD=$MQTT_PASSWORD
 
 echo "▶️ Starte Webserver..."
 
+# Beende alle laufenden Flask-Prozesse
+pkill -f "python3 /app/main.py" || true
+
+# Warte kurz, damit alle Prozesse beendet werden können
+sleep 1
+
 # Starte Flask-Server im Hintergrund
 python3 /app/main.py &
+FLASK_PID=$!
 
 # Warte kurz, damit der Flask-Server Zeit hat zu starten
 sleep 2
+
+# Prüfe, ob der Flask-Server erfolgreich gestartet wurde
+if ! ps -p $FLASK_PID > /dev/null; then
+    echo "❌ Flask-Server konnte nicht gestartet werden!"
+    exit 1
+fi
+
+echo "✅ Flask-Server erfolgreich gestartet (PID: $FLASK_PID)"
 
 # Starte NGINX als Hauptprozess
 exec nginx -c /etc/nginx/nginx.conf -g "daemon off;"

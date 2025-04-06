@@ -15,19 +15,11 @@ app = Flask(__name__, static_url_path='')
 app.config['APPLICATION_ROOT'] = '/'
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
-# Function to add CORS headers to responses
+# Simple CORS handling
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-Forwarded-For,X-Forwarded-Proto,X-Real-IP'
-    return response
-
-# Handle CORS preflight requests
-@app.route('/', methods=['OPTIONS'])
-@app.route('/<path:path>', methods=['OPTIONS'])
-def options_handler(path=None):
-    response = make_response()
-    response = add_cors_headers(response)
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
     return response
 processed_files = set()
 xml_data_list = []
@@ -49,7 +41,7 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "loau_685")
 MQTT_TOPIC = "tankdaten"
 
 # MQTT-Client einrichten
-mqtt_client = mqtt.Client(client_id="tankdaten_addon")  # Explizite client_id setzen
+mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="tankdaten_addon")  # Explizite client_id setzen und API Version 2 verwenden
 mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 mqtt_client.enable_logger()  # Debugging aktivieren
 try:

@@ -21,8 +21,6 @@ map:
   - ssl:rw
 ports:
   8088/tcp: 8088
-webui: http://[HOST]:[PORT:8088]/
-ingress_stream: true
 options:
   sftp_host: "192.168.5.205"
   sftp_port: 22
