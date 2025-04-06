@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tankdaten Übersicht v0.2.8</title>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #121212; /* Dunkler Hintergrund für Night-Mode */
+            color: #ffffff; /* Helle Schriftfarbe */
+        }
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .header-line {
+            border-bottom: 1px solid #4a90e2;
+            margin-bottom: 20px;
+        }
+        .reload-btn {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .reload-btn:hover {
+            background-color: #3a80d2;
+        }
+        .last-update {
+            text-align: right;
+            color: #cccccc;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #1e1e1e; /* Dunkler Tabellenhintergrund */
+            color: #ffffff; /* Helle Schriftfarbe */
+        }
+        th {
+            background-color: #4a90e2;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #333333; /* Kontrastreiche Trennlinien */
+        }
+        tr:nth-child(even) {
+            background-color: #2a2a2a; /* Abwechselnde Zeilenfarben */
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+    <script>
+        async function refreshData() {
+            try {
+                const response = await fetch('api/data', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    updateTable(data.files);
+                    document.querySelector('.last-update').textContent = 
+                        'Letzte Aktualisierung: ' + data.last_update;
+                }
+            } catch (error) {
+                console.error('Fehler beim Aktualisieren:', error);
+            }
+        }
+
+        function updateTable(files) {
+            const tbody = document.querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            files.forEach(file => {
+                file.transactions.forEach(row => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${row.number}</td>
+                            <td>${row.timestamp}</td>
+                            <td>${row.dispenser}</td>
+                            <td>${row.article}</td>
+                            <td>${row.quantity}</td>
+                            <td>${row.license_plate}</td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', () => {
+            // Refresh-Button Event Listener
+            document.querySelector('.reload-btn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const response = await fetch('refresh', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    updateTable(data.files);
+                    document.querySelector('.last-update').textContent = 
+                        'Letzte Aktualisierung: ' + data.last_update;
+                }
+            });
+
+            // Auto-Refresh starten
+            setInterval(refreshData, {{ refresh_interval * 1000 }});
+        });
+    </script>
+</head>
+<body>
+    <h1>Tankdaten Übersicht</h1>
+    <div class="header-line"></div>
+    
+    <button class="reload-btn">RELOAD</button>
+    
+    <div class="last-update">
+        Letzte Aktualisierung: {{ last_update if last_update else "Noch nicht aktualisiert" }}
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>NUMMER</th>
+                <th>DATUM + UHRZEIT</th>
+                <th>SÄULENNUMMER</th>
+                <th>ARTIKEL</th>
+                <th>MENGE (LITER)</th>
+                <th>KENNZEICHEN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file in files %}
+                {% for row in file.transactions %}
+                    <tr>
+                        <td>{{ row.number }}</td>
+                        <td>{{ row.timestamp }}</td>
+                        <td>{{ row.dispenser }}</td>
+                        <td>{{ row.article }}</td>
+                        <td>{{ row.quantity }}</td>
+                        <td>{{ row.license_plate }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        © 2025 FSV Tankdaten Reader
+    </div>
+</body>
+</html>
