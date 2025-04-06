@@ -132,7 +132,13 @@
             // Refresh-Button Event Listener
             document.querySelector('.reload-btn').addEventListener('click', (e) => {
                 e.preventDefault();
-                fetch('refresh', { method: 'POST' })
+                // Add X-Requested-With header to ensure JSON response
+                fetch('refresh', { 
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {

@@ -15,15 +15,17 @@ app = Flask(__name__, static_url_path='')
 app.config['APPLICATION_ROOT'] = '/'
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
-# Comprehensive CORS handling
+# Simplified headers for iframe compatibility
 def add_cors_headers(response):
+    # Basic CORS headers
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, X-Forwarded-For, X-Forwarded-Proto, X-Real-IP'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Requested-With'
+    
+    # Allow embedding in iframes (remove X-Frame-Options)
+    # Use Content-Security-Policy instead for more control
+    response.headers['Content-Security-Policy'] = "frame-ancestors *"
+    
     return response
 processed_files = set()
 xml_data_list = []
@@ -200,8 +202,8 @@ def refresh():
     """Endpoint für manuelles Refresh"""
     success = fetch_newest_files()
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Wenn AJAX Request, JSON zurückgeben
+    # For POST requests, always return JSON (for the refresh button)
+    if request.method == 'POST':
         response = jsonify({
             "success": success,
             "files": xml_data_list,
@@ -210,8 +212,8 @@ def refresh():
         # Add CORS headers
         response = add_cors_headers(response)
         return response
-
-    # Wenn normaler Request, zur Hauptseite zurückleiten
+    
+    # For GET requests, redirect to index
     return redirect(url_for('index'))
 
 # Handle OPTIONS requests for CORS preflight
