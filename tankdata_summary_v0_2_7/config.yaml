@@ -8,8 +8,12 @@ arch:
   - armv7
   - armhf
   - aarch64
+<<<<<<< HEAD
   - i386
 startup: application
+=======
+startup: services
+>>>>>>> parent of 4ffc53f (+ ssl)
 ingress: true
 panel_icon: mdi:gas-station
 boot: auto
