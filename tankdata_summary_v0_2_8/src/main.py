@@ -202,7 +202,6 @@ def index():
     return response
 
 @app.route("/api/data")
-@app.route("api/data")  # Also handle without leading slash
 def get_data():
     """API endpoint für AJAX requests"""
     with data_lock:
@@ -216,7 +215,6 @@ def get_data():
         return response
 
 @app.route("/refresh", methods=["GET", "POST"])
-@app.route("refresh", methods=["GET", "POST"])  # Also handle without leading slash
 def refresh():
     """Endpoint für manuelles Refresh"""
     success = fetch_newest_files()
