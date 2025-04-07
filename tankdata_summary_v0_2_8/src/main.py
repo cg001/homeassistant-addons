@@ -15,6 +15,9 @@ app = Flask(__name__, static_url_path='')
 app.config['APPLICATION_ROOT'] = '/'
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
+# Enable debug mode for more detailed error messages
+app.debug = True
+
 # Simplified headers for iframe compatibility
 def add_cors_headers(response):
     # Basic CORS headers
@@ -199,6 +202,7 @@ def index():
     return response
 
 @app.route("/api/data")
+@app.route("api/data")  # Also handle without leading slash
 def get_data():
     """API endpoint für AJAX requests"""
     with data_lock:
@@ -212,6 +216,7 @@ def get_data():
         return response
 
 @app.route("/refresh", methods=["GET", "POST"])
+@app.route("refresh", methods=["GET", "POST"])  # Also handle without leading slash
 def refresh():
     """Endpoint für manuelles Refresh"""
     success = fetch_newest_files()
@@ -257,5 +262,5 @@ if __name__ == "__main__":
     refresh_thread = threading.Thread(target=background_refresh, daemon=True)
     refresh_thread.start()
 
-    # Start the Flask app
-    app.run(host="0.0.0.0", port=8088)
+    # Start the Flask app with SSL disabled to avoid SSL errors
+    app.run(host="0.0.0.0", port=8088, ssl_context=None)

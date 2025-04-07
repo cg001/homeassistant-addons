@@ -73,38 +73,9 @@
         }
     </style>
     <script>
-        // Get base URL for API requests
-        function getBaseUrl() {
-            // Get the current URL
-            const url = new URL(window.location.href);
-            
-            // For Home Assistant ingress, the path might include a prefix
-            // Extract the path up to the last segment (which is likely empty or 'index.html')
-            let pathParts = url.pathname.split('/');
-            
-            // If the last part is empty (URL ends with /), remove it
-            if (pathParts[pathParts.length - 1] === '') {
-                pathParts.pop();
-            }
-            
-            // If the last part is index.html, remove it
-            if (pathParts[pathParts.length - 1] === 'index.html') {
-                pathParts.pop();
-            }
-            
-            // Join the path parts back together
-            const basePath = pathParts.join('/');
-            
-            // Log for debugging
-            console.log('Base URL:', basePath);
-            
-            return basePath;
-        }
-        
         async function refreshData() {
             try {
-                const baseUrl = getBaseUrl();
-                const response = await fetch(`${baseUrl}/api/data`, {
+                const response = await fetch('api/data', {
                     method: 'GET',
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -162,8 +133,7 @@
             document.querySelector('.reload-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 // Add X-Requested-With header to ensure JSON response
-                const baseUrl = getBaseUrl();
-                fetch(`${baseUrl}/refresh`, { 
+                fetch('refresh', { 
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
