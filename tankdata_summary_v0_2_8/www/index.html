@@ -75,7 +75,7 @@
     <script>
         async function refreshData() {
             try {
-                const response = await fetch('api/data', {
+                const response = await fetch('/api/data', {
                     method: 'GET',
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -133,7 +133,7 @@
             document.querySelector('.reload-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 // Add X-Requested-With header to ensure JSON response
-                fetch('refresh', { 
+                fetch('/refresh', { 
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -155,7 +155,7 @@
             });
 
             // Auto-Refresh starten
-            setInterval(refreshData, {{ refresh_interval * 1000 }});
+            setInterval(refreshData, parseInt("{{ refresh_interval * 1000 }}"));
         });
     </script>
 </head>

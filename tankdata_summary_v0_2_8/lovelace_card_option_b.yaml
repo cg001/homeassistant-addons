@@ -1,0 +1,19 @@
+type: vertical-stack
+cards:
+  - type: entities
+    title: Tankdaten Übersicht
+    entities:
+      - type: attribute
+        entity: sensor.tankdaten
+        attribute: transactions
+        name: Tankdaten
+        icon: mdi:gas-station
+  - type: button
+    name: Aktualisieren
+    icon: mdi:refresh
+    tap_action:
+      action: call-service
+      service: mqtt.publish
+      service_data:
+        topic: tankdaten/refresh
+        payload: "refresh"

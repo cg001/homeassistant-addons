@@ -46,14 +46,28 @@ MQTT_USERNAME = os.getenv("MQTT_USERNAME", "mqtt_loau")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "loau_685")
 MQTT_TOPIC = "tankdaten"
 
+# MQTT message handler
+def on_message(client, userdata, msg):
+    """Handle incoming MQTT messages."""
+    try:
+        if msg.topic == "tankdaten/refresh":
+            print("✅ Refresh requested via MQTT")
+            # Call the fetch function
+            fetch_newest_files()
+    except Exception as e:
+        print(f"❌ Error handling MQTT message: {e}")
+
 # MQTT-Client einrichten
 mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="tankdaten_addon")  # Explizite client_id setzen und API Version 2 verwenden
 mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 mqtt_client.enable_logger()  # Debugging aktivieren
+mqtt_client.on_message = on_message  # Set message handler
 try:
     mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=30)  # Keep-Alive auf 30 Sekunden setzen
+    mqtt_client.subscribe("tankdaten/refresh")  # Subscribe to refresh topic
     mqtt_client.loop_start()
     print(f"✅ Verbunden mit MQTT-Broker: {MQTT_BROKER}:{MQTT_PORT}")
+    print(f"✅ Subscribed to MQTT topic: tankdaten/refresh")
 except Exception as e:
     print(f"❌ Fehler beim Verbinden mit MQTT-Broker: {e}")
 

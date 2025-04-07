@@ -1,0 +1,27 @@
+type: vertical-stack
+cards:
+  - type: custom:table-card
+    title: Tankdaten Übersicht
+    data: "{{ state_attr('sensor.tankdaten', 'transactions') }}"
+    columns:
+      - title: NUMMER
+        data: number
+      - title: DATUM + UHRZEIT
+        data: timestamp
+      - title: SÄULENNUMMER
+        data: dispenser
+      - title: ARTIKEL
+        data: article
+      - title: MENGE (LITER)
+        data: quantity
+      - title: KENNZEICHEN
+        data: license_plate
+  - type: button
+    name: Aktualisieren
+    icon: mdi:refresh
+    tap_action:
+      action: call-service
+      service: mqtt.publish
+      service_data:
+        topic: tankdaten/refresh
+        payload: "refresh"
