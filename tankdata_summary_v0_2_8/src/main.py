@@ -81,8 +81,19 @@ with open(template_path) as f:
 def send_to_mqtt(data):
     """Sendet die geparsten Daten an MQTT."""
     try:
-        mqtt_client.publish(MQTT_TOPIC, json.dumps(data))
-        print(f"✅ Daten an MQTT gesendet: {len(data['transactions'])} Transaktionen")
+        # Print the data being sent for debugging
+        print(f"📤 Sende Daten an MQTT Topic '{MQTT_TOPIC}':")
+        print(f"📤 Daten: {json.dumps(data, indent=2)[:200]}...")  # Print first 200 chars
+        
+        # Publish to MQTT
+        result = mqtt_client.publish(MQTT_TOPIC, json.dumps(data))
+        
+        # Check if the publish was successful
+        if result.rc == 0:
+            print(f"✅ Daten an MQTT gesendet: {len(data['transactions'])} Transaktionen")
+        else:
+            print(f"⚠️ MQTT Publish returned code {result.rc}")
+            
     except Exception as e:
         print(f"❌ Fehler beim Senden an MQTT: {e}")
 
@@ -130,7 +141,7 @@ def fetch_newest_files():
                             "timestamp": txn.findtext("TransactionStartDate", ""),
                             "dispenser": txn.findtext(".//DispenserNumber", ""),
                             "article": article_name,
-                            "quantity": txn.findtext("TransactionQuantity", ""),
+                            "quantity": quantity,  # Use the modified quantity with comma
                             "license_plate": license_plate
                         })
 
