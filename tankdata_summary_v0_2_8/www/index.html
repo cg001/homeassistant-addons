@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors *; upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -75,7 +75,7 @@
     <script>
         async function refreshData() {
             try {
-                const response = await fetch('/api/data', {
+                const response = await fetch('api/data', {
                     method: 'GET',
                     headers: {
                         'Cache-Control': 'no-cache'
@@ -133,7 +133,7 @@
             document.querySelector('.reload-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 // Add X-Requested-With header to ensure JSON response
-                fetch('/refresh', { 
+                fetch('refresh', { 
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
