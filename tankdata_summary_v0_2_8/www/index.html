@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors *; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors *">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -73,30 +73,37 @@
         }
     </style>
     <script>
-        async function refreshData() {
-            try {
-                const response = await fetch('api/data', {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-cache'
+        function refreshData() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'api/data', true);
+            xhr.setRequestHeader('Cache-Control', 'no-cache');
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        updateTable(data.files);
+                        document.querySelector('.last-update').textContent = 
+                            'Letzte Aktualisierung: ' + data.last_update;
                     }
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    updateTable(data.files);
+                } else {
+                    console.error('Fehler beim Aktualisieren: Status ' + xhr.status);
                     document.querySelector('.last-update').textContent = 
-                        'Letzte Aktualisierung: ' + data.last_update;
+                        'Fehler beim Aktualisieren: Status ' + xhr.status;
                 }
-            } catch (error) {
-                console.error('Fehler beim Aktualisieren:', error);
+            };
+            
+            xhr.onerror = function() {
+                console.error('Fehler beim Aktualisieren: Netzwerkfehler');
                 document.querySelector('.last-update').textContent = 
-                    'Fehler beim Aktualisieren: ' + error;
-            }
+                    'Fehler beim Aktualisieren: Netzwerkfehler';
+            };
+            
+            xhr.send();
         }
 
         function updateTable(files) {
-            const tbody = document.querySelector('tbody');
+            var tbody = document.querySelector('tbody');
             tbody.innerHTML = '';
             
             if (!files || files.length === 0) {
@@ -104,54 +111,60 @@
                 return;
             }
             
-            files.forEach(file => {
+            files.forEach(function(file) {
                 if (!file.transactions || file.transactions.length === 0) {
                     return;
                 }
                 
-                file.transactions.forEach(row => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${row.number || '-'}</td>
-                            <td>${row.timestamp || '-'}</td>
-                            <td>${row.dispenser || '-'}</td>
-                            <td>${row.article || '-'}</td>
-                            <td>${row.quantity || '-'}</td>
-                            <td>${row.license_plate || '-'}</td>
-                        </tr>
-                    `;
+                file.transactions.forEach(function(row) {
+                    tbody.innerHTML += 
+                        '<tr>' +
+                            '<td>' + (row.number || '-') + '</td>' +
+                            '<td>' + (row.timestamp || '-') + '</td>' +
+                            '<td>' + (row.dispenser || '-') + '</td>' +
+                            '<td>' + (row.article || '-') + '</td>' +
+                            '<td>' + (row.quantity || '-') + '</td>' +
+                            '<td>' + (row.license_plate || '-') + '</td>' +
+                        '</tr>';
                 });
             });
         }
 
         // Initialisierung
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             // Initial data load
             refreshData();
             
             // Refresh-Button Event Listener
-            document.querySelector('.reload-btn').addEventListener('click', (e) => {
+            document.querySelector('.reload-btn').addEventListener('click', function(e) {
                 e.preventDefault();
-                // Add X-Requested-With header to ensure JSON response
-                fetch('refresh', { 
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'refresh', true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
                         if (data.success) {
                             updateTable(data.files);
                             document.querySelector('.last-update').textContent = 
                                 'Letzte Aktualisierung: ' + data.last_update;
                         }
-                    })
-                    .catch(error => {
-                        console.error('Fehler beim manuellen Refresh:', error);
+                    } else {
+                        console.error('Fehler beim manuellen Refresh: Status ' + xhr.status);
                         document.querySelector('.last-update').textContent = 
-                            'Fehler beim manuellen Refresh: ' + error;
-                    });
+                            'Fehler beim manuellen Refresh: Status ' + xhr.status;
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    console.error('Fehler beim manuellen Refresh: Netzwerkfehler');
+                    document.querySelector('.last-update').textContent = 
+                        'Fehler beim manuellen Refresh: Netzwerkfehler';
+                };
+                
+                xhr.send();
             });
 
             // Auto-Refresh starten
