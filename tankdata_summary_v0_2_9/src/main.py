@@ -49,6 +49,7 @@ MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", "mqtt_loau")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "loau_685")
 MQTT_TOPIC = "tankdaten"
+MQTT_UPDATE_TOPIC = "tankdaten/update"  # Neues Topic für Aktualisierungen
 
 # MQTT message handler
 def on_message(client, userdata, msg):
@@ -259,6 +260,42 @@ def refresh():
     
     # For GET requests, redirect to index
     return redirect(url_for('index'))
+
+@app.route("/mqtt_refresh", methods=["GET", "POST"])
+def mqtt_refresh():
+    """Endpoint nur für MQTT-Refresh"""
+    global last_update
+    
+    # Aktualisiere den Zeitstempel
+    last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
+    
+    # Sende Daten an MQTT mit neuem Zeitstempel
+    with data_lock:
+        if xml_data_list:
+            # Kopie der Daten erstellen und Zeitstempel aktualisieren
+            data_copy = xml_data_list[0].copy()
+            
+            # An das Haupt-Topic senden
+            mqtt_client.publish(MQTT_TOPIC, json.dumps({
+                "filename": data_copy["filename"],
+                "transactions": data_copy["transactions"],
+                "last_update": last_update,
+                "refresh_id": datetime.now().timestamp()
+            }))
+            
+            # Zusätzlich an das Update-Topic senden
+            update_data = {
+                "last_update": last_update,
+                "timestamp": datetime.now().timestamp()
+            }
+            mqtt_client.publish(MQTT_UPDATE_TOPIC, json.dumps(update_data))
+            
+            print(f"✅ MQTT-Refresh durchgeführt: {last_update}")
+    
+    # Für GET und POST Anfragen JSON zurückgeben
+    response = jsonify({"success": True, "last_update": last_update})
+    response = add_cors_headers(response)
+    return response
 
 # Handle OPTIONS requests for CORS preflight
 @app.route('/', methods=['OPTIONS'])

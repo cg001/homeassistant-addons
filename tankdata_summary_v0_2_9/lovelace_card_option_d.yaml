@@ -2,7 +2,7 @@ type: vertical-stack
 cards:
   - type: markdown
     content: >
-      **Letzte Aktualisierung:** {{ state_attr('sensor.tankdaten', 'last_update') }}
+      **Letzte Aktualisierung:** {{ states('sensor.tankdaten_update') }}
     style: |
       ha-card {
         padding: 8px 16px;
@@ -72,8 +72,5 @@ cards:
     name: Aktualisieren
     icon: mdi:refresh
     tap_action:
-      action: call-service
-      service: mqtt.publish
-      service_data:
-        topic: tankdaten/refresh
-        payload: "refresh"
+      action: url
+      url_path: "/addons/tankdata_summary_v0_2_9/mqtt_refresh"

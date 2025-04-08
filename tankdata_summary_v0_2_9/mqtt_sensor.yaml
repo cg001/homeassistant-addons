@@ -5,3 +5,8 @@ mqtt:
       value_template: "{{ value_json.transactions | count }}"
       json_attributes_topic: "tankdaten"
       json_attributes_template: "{{ value_json | tojson }}"
+    
+    # Neuer Sensor für das Update-Topic
+    - name: "tankdaten_update"
+      state_topic: "tankdaten/update"
+      value_template: "{{ value_json.last_update }}"
