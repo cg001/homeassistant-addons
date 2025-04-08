@@ -81,9 +81,10 @@ with open(template_path) as f:
 def send_to_mqtt(data):
     """Sendet die geparsten Daten an MQTT."""
     try:
-        # Add last_update to the data
+        # Add last_update and refresh_id to the data
         data_with_timestamp = data.copy()
         data_with_timestamp['last_update'] = last_update
+        data_with_timestamp['refresh_id'] = datetime.now().timestamp()  # Eindeutige ID für jeden Refresh
         
         # Print the data being sent for debugging
         print(f"📤 Sende Daten an MQTT Topic '{MQTT_TOPIC}':")

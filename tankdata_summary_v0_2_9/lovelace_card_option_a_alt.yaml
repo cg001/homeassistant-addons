@@ -12,21 +12,20 @@ cards:
   - type: custom:flex-table-card
     title: Tankdaten Übersicht
     entities:
-      - entity: sensor.tankdaten
-        data_path: transactions
+      - sensor.tankdaten
     columns:
-      - name: NUMMER
-        data: number
-      - name: DATUM + UHRZEIT
-        data: timestamp
-      - name: SÄULENNUMMER
-        data: dispenser
-      - name: ARTIKEL
-        data: article
-      - name: MENGE (LITER)
-        data: quantity
-      - name: KENNZEICHEN
-        data: license_plate
+      - data: attributes.transactions[].number
+        name: NUMMER
+      - data: attributes.transactions[].timestamp
+        name: DATUM + UHRZEIT
+      - data: attributes.transactions[].dispenser
+        name: SÄULENNUMMER
+      - data: attributes.transactions[].article
+        name: ARTIKEL
+      - data: attributes.transactions[].quantity
+        name: MENGE (LITER)
+      - data: attributes.transactions[].license_plate
+        name: KENNZEICHEN
   - type: button
     name: Aktualisieren
     icon: mdi:refresh
