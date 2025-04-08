@@ -105,6 +105,10 @@ def send_to_mqtt(data):
 
 def fetch_newest_files():
     global processed_files, xml_data_list, last_update
+    
+    # Aktualisiere den Zeitstempel immer, unabhängig vom Ergebnis
+    last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
+    
     try:
         transport = paramiko.Transport((SFTP_HOST, SFTP_PORT))
         transport.connect(username=SFTP_USER, password=SFTP_PASS)
@@ -191,12 +195,18 @@ def fetch_newest_files():
 
             # Sende Daten an MQTT
             send_to_mqtt(xml_data_list[0])
-
-            last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
+            
+            # Zeitstempel wird bereits am Anfang der Funktion gesetzt
+            # last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
 
         return True
     except Exception as e:
         print("❌ Fehler beim SFTP-Zugriff:", str(e))
+        # Auch bei Fehlern die aktuellen Daten mit neuem Zeitstempel senden
+        with data_lock:
+            if xml_data_list:
+                send_to_mqtt(xml_data_list[0])
+        
         return False
 
 def background_refresh():
