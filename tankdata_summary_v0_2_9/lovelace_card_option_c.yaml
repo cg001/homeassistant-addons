@@ -1,0 +1,33 @@
+type: vertical-stack
+cards:
+  - type: markdown
+    content: >
+      **Letzte Aktualisierung:** {{ state_attr('sensor.tankdaten', 'last_update') }}
+    style: |
+      ha-card {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: var(--text-primary-color);
+      }
+  - type: markdown
+    title: Tankdaten Übersicht
+    content: |-
+      {% set data = state_attr('sensor.tankdaten', 'transactions') %}
+      {% if data %}
+      | NUMMER | DATUM + UHRZEIT | SÄULE | ARTIKEL | MENGE | KENNZEICHEN |
+      | ------ | --------------- | ----- | ------- | ----- | ----------- |
+      {% for item in data %}
+      | {{ item.number }} | {{ item.timestamp }} | {{ item.dispenser }} | {{ item.article }} | {{ item.quantity }} | {{ item.license_plate }} |
+      {% endfor %}
+      {% else %}
+      Keine Daten verfügbar
+      {% endif %}
+  - type: button
+    name: Aktualisieren
+    icon: mdi:refresh
+    tap_action:
+      action: call-service
+      service: mqtt.publish
+      service_data:
+        topic: tankdaten/refresh
+        payload: "refresh"

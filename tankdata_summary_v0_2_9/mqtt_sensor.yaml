@@ -1,0 +1,6 @@
+mqtt:
+  sensor:
+    - name: "tankdaten"
+      state_topic: "tankdaten"
+      value_template: "{{ value_json.transactions | count }}"
+      json_attributes_topic: "tankdaten"
