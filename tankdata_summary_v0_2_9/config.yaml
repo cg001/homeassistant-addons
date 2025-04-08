@@ -32,6 +32,7 @@ options:
   mqtt_port: 1883
   mqtt_username: "mqtt_loau"
   mqtt_password: "loau_685"
+  max_transactions: 10
 schema:
   sftp_host: str
   sftp_port: int
@@ -43,3 +44,4 @@ schema:
   mqtt_port: int
   mqtt_username: str
   mqtt_password: password
+  max_transactions: int(1,50)

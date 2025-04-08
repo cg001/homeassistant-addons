@@ -41,6 +41,7 @@ SFTP_USER = os.getenv("SFTP_USER")
 SFTP_PASS = os.getenv("SFTP_PASS")
 SFTP_DIR = os.getenv("SFTP_DIR")
 REFRESH_INTERVAL = int(os.getenv("REFRESH_INTERVAL", "60"))  # Default to 60 seconds
+MAX_TRANSACTIONS = int(os.getenv("MAX_TRANSACTIONS", "10"))  # Default to 10 transactions
 
 # MQTT-Konfiguration
 MQTT_BROKER = os.getenv("MQTT_BROKER", "core-mosquitto")
@@ -157,7 +158,7 @@ def fetch_newest_files():
                         })
                         temp_processed.add(f.filename)
 
-                if len(new_data) >= 20:  # Limit auf 20 Dateien
+                if len(new_data) >= MAX_TRANSACTIONS:  # Limit auf konfigurierte Anzahl Dateien
                     break
             except Exception as e:
                 print("Fehler beim Parsen:", f.filename, str(e))
@@ -182,10 +183,10 @@ def fetch_newest_files():
             # Sortiere nach Zeitstempel und erstelle neue Dateiliste
             sorted_transactions = sorted(all_transactions, key=lambda x: x["timestamp"], reverse=True)
 
-            # Begrenze auf die neuesten 20 Transaktionen
+            # Begrenze auf die konfigurierten neuesten Transaktionen
             xml_data_list = [{
                 "filename": "combined",
-                "transactions": sorted_transactions[:20]
+                "transactions": sorted_transactions[:MAX_TRANSACTIONS]
             }]
 
             # Sende Daten an MQTT
