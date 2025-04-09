@@ -1,0 +1,76 @@
+type: vertical-stack
+cards:
+  - type: markdown
+    content: >
+      **Letzte Aktualisierung:** {{ states('sensor.tankdaten_update') }}
+    style: |
+      ha-card {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: var(--text-primary-color);
+      }
+  - type: custom:card-mod
+    card:
+      type: markdown
+      title: Tankdaten Übersicht
+      content: |-
+        {% set data = state_attr('sensor.tankdaten', 'transactions') %}
+        {% if data %}
+        <div class="tankdaten-table">
+          <table>
+            <thead>
+              <tr>
+                <th>NUMMER</th>
+                <th>DATUM + UHRZEIT</th>
+                <th>SÄULE</th>
+                <th>ARTIKEL</th>
+                <th>MENGE</th>
+                <th>KENNZEICHEN</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in data %}
+              <tr>
+                <td>{{ item.number }}</td>
+                <td>{{ item.timestamp }}</td>
+                <td>{{ item.dispenser }}</td>
+                <td>{{ item.article }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.license_plate }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        Keine Daten verfügbar
+        {% endif %}
+    style: |
+      ha-card {
+        padding: 16px;
+      }
+      .tankdaten-table table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .tankdaten-table th {
+        background-color: var(--primary-color);
+        color: var(--text-primary-color);
+        padding: 10px;
+        text-align: left;
+        font-weight: bold;
+      }
+      .tankdaten-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--divider-color);
+      }
+      .tankdaten-table tr:nth-child(even) {
+        background-color: var(--table-row-alternative-background-color, var(--secondary-background-color));
+      }
+  - type: button
+    name: Aktualisieren
+    icon: mdi:refresh
+    tap_action:
+      action: url
+      url_path: "/addons/tankdata_summary_v0_2_9/mqtt_refresh"

@@ -1,0 +1,61 @@
+#!/usr/bin/with-contenv bashio
+
+# Konfiguration aus config.yaml lesen
+HOST=$(bashio::config 'sftp_host')
+PORT=$(bashio::config 'sftp_port')
+USER=$(bashio::config 'sftp_username')
+PASS=$(bashio::config 'sftp_password')
+DIR=$(bashio::config 'sftp_directory')
+REFRESH=$(bashio::config 'refresh_interval')
+MQTT_BROKER=$(bashio::config 'mqtt_broker')
+MQTT_PORT=$(bashio::config 'mqtt_port')
+MQTT_USERNAME=$(bashio::config 'mqtt_username')
+MQTT_PASSWORD=$(bashio::config 'mqtt_password')
+
+# Umgebungsvariablen für die Anwendung setzen
+export SFTP_HOST=$HOST
+export SFTP_PORT=$PORT
+export SFTP_USER=$USER
+export SFTP_PASS=$PASS
+export SFTP_DIR=$DIR
+export REFRESH_INTERVAL=$REFRESH
+export MQTT_BROKER=$MQTT_BROKER
+export MQTT_PORT=$MQTT_PORT
+export MQTT_USERNAME=$MQTT_USERNAME
+export MQTT_PASSWORD=$MQTT_PASSWORD
+
+echo "▶️ Starte Webserver..."
+
+# Beende alle laufenden Flask-Prozesse (BusyBox-kompatibel)
+killall python3 2>/dev/null || true
+
+# Warte kurz, damit alle Prozesse beendet werden können
+sleep 1
+
+# Stelle sicher, dass kein Prozess mehr auf Port 8088 läuft
+# Wir verwenden einen einfacheren Ansatz, der in BusyBox funktionieren sollte
+echo "⚠️ Stelle sicher, dass Port 8088 frei ist..."
+# Beende alle Python-Prozesse, die möglicherweise den Port belegen
+killall python3 2>/dev/null || true
+# Warte einen Moment
+sleep 2
+
+# Starte Flask-Server im Hintergrund mit Fehlerumleitung
+echo "🔄 Starte Flask-Server..."
+python3 /app/main.py > /dev/stdout 2>&1 &
+FLASK_PID=$!
+
+# Warte kurz, damit der Flask-Server Zeit hat zu starten
+echo "⏳ Warte auf Flask-Server Start..."
+sleep 3
+
+# Prüfe, ob der Flask-Server erfolgreich gestartet wurde (BusyBox-kompatibel)
+if kill -0 $FLASK_PID 2>/dev/null; then
+    echo "✅ Flask-Server erfolgreich gestartet (PID: $FLASK_PID)"
+else
+    echo "⚠️ Prozess-Check fehlgeschlagen, versuche trotzdem fortzufahren..."
+    # Wir setzen hier keinen exit, um den Addon nicht zu beenden
+fi
+
+# Starte NGINX als Hauptprozess
+exec nginx -c /etc/nginx/nginx.conf -g "daemon off;"

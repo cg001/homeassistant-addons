@@ -1,0 +1,37 @@
+type: vertical-stack
+cards:
+  - type: markdown
+    content: >
+      **Letzte Aktualisierung:** {{ state_attr('sensor.tankdaten', 'last_update') }}
+    style: |
+      ha-card {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: var(--text-primary-color);
+      }
+  - type: custom:flex-table-card
+    title: Tankdaten Übersicht
+    entities:
+      - sensor.tankdaten
+    columns:
+      - data: attributes.transactions[].number
+        name: NUMMER
+      - data: attributes.transactions[].timestamp
+        name: DATUM + UHRZEIT
+      - data: attributes.transactions[].dispenser
+        name: SÄULENNUMMER
+      - data: attributes.transactions[].article
+        name: ARTIKEL
+      - data: attributes.transactions[].quantity
+        name: MENGE (LITER)
+      - data: attributes.transactions[].license_plate
+        name: KENNZEICHEN
+  - type: button
+    name: Aktualisieren
+    icon: mdi:refresh
+    tap_action:
+      action: call-service
+      service: mqtt.publish
+      service_data:
+        topic: tankdaten/refresh
+        payload: "refresh"
