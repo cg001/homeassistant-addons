@@ -1,0 +1,25 @@
+type: vertical-stack
+cards:
+  - type: markdown
+    content: >
+      **Letzte Aktualisierung:** {{ states('sensor.tankdaten_update') }}
+    style: |
+      ha-card {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: var(--text-primary-color);
+      }
+  - type: entities
+    title: Tankdaten Übersicht
+    entities:
+      - type: attribute
+        entity: sensor.tankdaten
+        attribute: transactions
+        name: Tankdaten
+        icon: mdi:gas-station
+  - type: button
+    name: Aktualisieren
+    icon: mdi:refresh
+    tap_action:
+      action: url
+      url_path: "/addons/tankdata_summary_v0_2_9/mqtt_refresh"
