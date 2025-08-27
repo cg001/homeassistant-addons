@@ -162,7 +162,7 @@ def fetch_newest_files():
                         })
                         temp_processed.add(f.filename)
 
-                if len(new_data) >= MAX_TRANSACTIONS:  # Limit auf konfigurierte Anzahl Dateien
+                if len(new_data) >= 100:  # Limit auf 100 Dateien um genug Transaktionen zu sammeln
                     break
             except Exception as e:
                 print("Fehler beim Parsen:", f.filename, str(e))
@@ -278,6 +278,10 @@ def after_request(response):
     return add_cors_headers(response)
 
 if __name__ == "__main__":
+    # Debug: Print environment variables
+    print(f"🔧 MAX_TRANSACTIONS environment variable: {os.getenv('MAX_TRANSACTIONS', 'NOT SET')}")
+    print(f"🔧 Using MAX_TRANSACTIONS value: {MAX_TRANSACTIONS}")
+    
     # Set initial timestamp
     last_update = datetime.now().strftime("%d.%m.%Y, %H:%M:%S")
 

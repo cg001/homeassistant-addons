@@ -27,4 +27,4 @@ cards:
     icon: mdi:refresh
     tap_action:
       action: url
-      url_path: "/addons/tankdata_summary_v0_2_9/refresh"
+      url_path: "/api/hassio_ingress/tankdata_summary_v0_2_9/refresh"
