@@ -11,6 +11,7 @@ MQTT_BROKER=$(bashio::config 'mqtt_broker')
 MQTT_PORT=$(bashio::config 'mqtt_port')
 MQTT_USERNAME=$(bashio::config 'mqtt_username')
 MQTT_PASSWORD=$(bashio::config 'mqtt_password')
+MAX_TRANS=$(bashio::config 'max_transactions')
 
 # Umgebungsvariablen für die Anwendung setzen
 export SFTP_HOST=$HOST
@@ -23,6 +24,7 @@ export MQTT_BROKER=$MQTT_BROKER
 export MQTT_PORT=$MQTT_PORT
 export MQTT_USERNAME=$MQTT_USERNAME
 export MQTT_PASSWORD=$MQTT_PASSWORD
+export MAX_TRANSACTIONS=$MAX_TRANS
 
 echo "▶️ Starte Webserver..."
 
